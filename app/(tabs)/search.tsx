@@ -6,9 +6,7 @@ import { Text, View } from "@/components/Themed";
 export default function SearchScreen() {
   return (
     <SafeAreaView>
-      <View>
-        <EditScreenInfo path="app/(tabs)/search.tsx" />
-      </View>
+      <EditScreenInfo path="app/(tabs)/search.tsx" />
     </SafeAreaView>
   );
 }
