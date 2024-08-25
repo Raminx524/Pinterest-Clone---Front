@@ -1,4 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-use-before-define
+import EditScreenInfo from "@/components/EditScreenInfo";
 import type { FC, ReactElement } from "react";
 import {
   Image,
@@ -16,20 +16,20 @@ import {
   NativeModules,
 } from "react-native";
 import React, { useEffect, useMemo, useState } from "react";
-import type { StyleProp, ViewStyle } from "react-native";
+import type { ListRenderItemInfo, StyleProp, ViewStyle } from "react-native";
 
 import { Colors } from "react-native/Libraries/NewAppScreen";
 import MasonryList from "@react-native-seoul/masonry-list";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import DeviceInfo from "react-native-device-info";
+// import DeviceInfo from "react-native-device-info";
 
-interface Furniture {
+interface Pin {
   id: string;
   imgURL: string;
   text: string;
 }
 
-const data: Furniture[] = [
+const data: Pin[] = [
   {
     id: "id123",
     imgURL:
@@ -176,21 +176,27 @@ const data: Furniture[] = [
   },
 ];
 
-const ShareMenu = ({ visible, onClose, item }) => {
+const ShareMenu = ({
+  visible,
+  onClose,
+  item,
+}: {
+  visible: boolean;
+  onClose: () => void;
+  item: Pin;
+}) => {
   const [isWhatsAppInstalled, setWhatsAppInstalled] = useState(false);
   const [isMessengerInstalled, setMessengerInstalled] = useState(false);
 
   useEffect(() => {
     const checkAppsAvailability = async () => {
       try {
-        const whatsappSupported = await Linking.canOpenURL(
-          "whatsapp://send?text=Hello"
-        );
-        console.log(whatsappSupported);
+        // const whatsappSupported = "tel://1234567890";
+        const whatsappSupported = await Linking.canOpenURL("instagram://app");
+        console.log("WhatsApp Supported: ", whatsappSupported);
 
-        const messengerSupported = await Linking.canOpenURL(
-          "fb-messenger://share?link=Hello"
-        );
+        const messengerSupported = await Linking.canOpenURL("fb://profile");
+        console.log("Messenger Supported: ", messengerSupported);
 
         setWhatsAppInstalled(whatsappSupported);
         setMessengerInstalled(messengerSupported);
@@ -271,13 +277,14 @@ const ShareMenu = ({ visible, onClose, item }) => {
   );
 };
 
-const PinCard: FC<{ item: Furniture; style: StyleProp<ViewStyle> }> = ({
+const PinCard: FC<{ item: Pin; style: StyleProp<ViewStyle> }> = ({
   item,
   style,
 }) => {
   const randomBool = useMemo(() => Math.random() < 0.5, []);
   const [isShareMenuVisible, setShareMenuVisible] = useState(false);
 
+  const isDarkMode = useColorScheme() === "dark";
   return (
     <View key={item.id} style={[{ marginTop: 12, flex: 1, gap: 5 }, style]}>
       <Image
@@ -305,11 +312,19 @@ const PinCard: FC<{ item: Furniture; style: StyleProp<ViewStyle> }> = ({
             style={styles.shareButton}
             onPress={() => setShareMenuVisible(true)}
           >
-            <MaterialCommunityIcons name="dots-horizontal" size={20} />
+            <MaterialCommunityIcons
+              name="dots-horizontal"
+              size={20}
+              color={isDarkMode ? "white" : "black"}
+            />
           </TouchableOpacity>
         </View>
         <View style={[{ flex: 4 }]}>
-          <Text style={[{ fontSize: 14 }]}>{item.text}</Text>
+          <Text
+            style={[{ fontSize: 14, color: isDarkMode ? "white" : "black" }]}
+          >
+            {item.text}
+          </Text>
         </View>
         <View style={[{ flex: 1 }]}>
           <Image
@@ -334,23 +349,24 @@ const PinCard: FC<{ item: Furniture; style: StyleProp<ViewStyle> }> = ({
   );
 };
 
-const App: FC = () => {
+export default function TabOneScreen() {
   const isDarkMode = useColorScheme() === "dark";
+  // const isDarkMode = false;
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
     flex: 1,
   };
 
-  const renderItem = ({ item, i }): ReactElement => {
+  const renderItem = ({ item, i }: { item: Pin; i: number }): ReactElement => {
     return <PinCard item={item} style={{ marginLeft: i % 2 === 0 ? 0 : 12 }} />;
   };
 
   return (
     <SafeAreaView style={backgroundStyle}>
-      <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
+      {/* <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} /> */}
       <MasonryList
-        keyExtractor={(item: Furniture): string => item.id}
+        keyExtractor={(item: Pin): string => item.id}
         ListHeaderComponent={<View />}
         contentContainerStyle={{
           paddingHorizontal: 24,
@@ -359,12 +375,11 @@ const App: FC = () => {
         onEndReached={() => console.log("onEndReached")}
         numColumns={2}
         data={data}
-        renderItem={renderItem}
+        renderItem={renderItem as any}
       />
     </SafeAreaView>
   );
-};
-
+}
 const styles = StyleSheet.create({
   card: {
     marginTop: 12,
@@ -423,5 +438,3 @@ const styles = StyleSheet.create({
     color: "blue",
   },
 });
-
-export default App;
