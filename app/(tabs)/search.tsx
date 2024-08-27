@@ -255,7 +255,7 @@ export default function SearchScreen() {
           </View>
         )}
         {focused && (
-          <View>
+          <ScrollView>
           {filteredData(searchHistory).slice(0, search.length==0?20:6).map(item => (
             <TouchableOpacity key={item.id} onPress={() => handleSelection(item.text)} style={styles.searchItem}>
               <FontAwesomeIcon icon={faMagnifyingGlass} size={15} color="#000" style={styles.searchIcon} />
@@ -283,7 +283,7 @@ export default function SearchScreen() {
           <Link href={'/saved'} asChild>
           <Button title="Search your pins" buttonStyle={styles.myPinsButton} onPress={() => {/* handle press */}} />
           </Link>
-        </View>
+        </ScrollView>
         )}
       </View>
     </SafeAreaView>
