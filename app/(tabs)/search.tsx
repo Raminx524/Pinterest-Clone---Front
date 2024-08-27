@@ -10,7 +10,7 @@ import { Link } from 'expo-router';
 
 export default function SearchScreen() {
   const [search, setSearch] = useState<string>('');
-  const [focused, setFocused] = useState<boolean>(search.length>0 ?true:false);
+  const [focused, setFocused] = useState<boolean>(false);
   const [searchHistory, setSearchHistory] = useState<Pin[]>([
     {
       id: 'id010',
