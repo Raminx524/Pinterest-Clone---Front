@@ -23,13 +23,13 @@ import { LinearGradient } from "expo-linear-gradient";
 import Divider from "@/components/Devider";
 import Modal from "react-native-modal";
 
-interface Pin {
+export interface Pin {
   id: string;
   imgURL: string;
   text: string;
 }
 
-const data: Pin[] = [
+export const data: Pin[] = [
   {
     id: "id123",
     imgURL:

@@ -1,23 +1,188 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { StyleSheet, StatusBar, FlatList, Text, Image, TouchableOpacity, View, TextInput } from 'react-native';
+import { StyleSheet, StatusBar, FlatList, Text, Image, TouchableOpacity, View, TextInput, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from 'react-native-elements';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCamera, faCircleXmark, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import { faCamera, faCircleXmark, faMagnifyingGlass, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { color } from 'react-native-elements/dist/helpers';
+import { data } from './index';
+import { Link } from 'expo-router';
 
 export default function SearchScreen() {
   const [search, setSearch] = useState<string>('');
-  const [focused, setFocused] = useState<boolean>(false);
+  const [focused, setFocused] = useState<boolean>(search.length>0 ?true:false);
+  const [searchHistory, setSearchHistory] = useState<Pin[]>([
+    {
+      id: 'id010',
+      imgURL: 'https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/drew-barrymore-flower-home-petal-chair-1594829759.jpeg?crop=1xw:1xh;center,top&resize=768:*',
+      text: 'Cats',
+    },
+    {
+      id: 'id011',
+      imgURL: 'https://ii1.pepperfry.com/media/catalog/product/m/o/568x625/modern-chaise-lounger-in-grey-colour-by-dreamzz-furniture-modern-chaise-lounger-in-grey-colour-by-dr-tmnirx.jpg',
+      text: 'Dogs',
+    },
+    {
+      id: 'id012',
+      imgURL: 'https://example.com/image1.jpg',
+      text: 'Nature',
+    },
+    {
+      id: 'id013',
+      imgURL: 'https://example.com/image2.jpg',
+      text: 'Travel',
+    },
+    {
+      id: 'id014',
+      imgURL: 'https://example.com/image3.jpg',
+      text: 'Food',
+    },
+    {
+      id: 'id015',
+      imgURL: 'https://example.com/image4.jpg',
+      text: 'Fashion',
+    },
+    {
+      id: 'id016',
+      imgURL: 'https://example.com/image5.jpg',
+      text: 'Technology',
+    },
+    {
+      id: 'id017',
+      imgURL: 'https://example.com/image6.jpg',
+      text: 'Fitness',
+    },
+    {
+      id: 'id018',
+      imgURL: 'https://example.com/image7.jpg',
+      text: 'Art',
+    },
+    {
+      id: 'id019',
+      imgURL: 'https://example.com/image8.jpg',
+      text: 'Photography',
+    },
+    {
+      id: 'id020',
+      imgURL: 'https://example.com/image9.jpg',
+      text: 'Home Decor',
+    },
+    {
+      id: 'id021',
+      imgURL: 'https://example.com/image10.jpg',
+      text: 'DIY',
+    },
+    {
+      id: 'id022',
+      imgURL: 'https://example.com/image11.jpg',
+      text: 'Gardening',
+    },
+    {
+      id: 'id023',
+      imgURL: 'https://example.com/image12.jpg',
+      text: 'Recipes',
+    },
+    {
+      id: 'id024',
+      imgURL: 'https://example.com/image13.jpg',
+      text: 'Architecture',
+    },
+    {
+      id: 'id025',
+      imgURL: 'https://example.com/image14.jpg',
+      text: 'Music',
+    },
+    {
+      id: 'id026',
+      imgURL: 'https://example.com/image15.jpg',
+      text: 'Movies',
+    },
+    {
+      id: 'id027',
+      imgURL: 'https://example.com/image16.jpg',
+      text: 'Sports',
+    },
+    {
+      id: 'id028',
+      imgURL: 'https://example.com/image17.jpg',
+      text: 'Education',
+    },
+    {
+      id: 'id029',
+      imgURL: 'https://example.com/image18.jpg',
+      text: 'Science',
+    },
+    {
+      id: 'id030',
+      imgURL: 'https://example.com/image19.jpg',
+      text: 'Animals',
+    },
+    {
+      id: 'id031',
+      imgURL: 'https://example.com/image20.jpg',
+      text: 'Events',
+    },
+    {
+      id: 'id032',
+      imgURL: 'https://example.com/image21.jpg',
+      text: 'Weddings',
+    },
+    {
+      id: 'id033',
+      imgURL: 'https://example.com/image22.jpg',
+      text: 'Lifestyle',
+    },
+    {
+      id: 'id034',
+      imgURL: 'https://example.com/image23.jpg',
+      text: 'Travel Tips',
+    },
+    {
+      id: 'id035',
+      imgURL: 'https://example.com/image24.jpg',
+      text: 'Kids',
+    },
+    {
+      id: 'id036',
+      imgURL: 'https://example.com/image25.jpg',
+      text: 'Camping',
+    },
+    {
+      id: 'id037',
+      imgURL: 'https://example.com/image26.jpg',
+      text: 'Beach',
+    },
+    {
+      id: 'id038',
+      imgURL: 'https://example.com/image27.jpg',
+      text: 'Winter',
+    },
+    {
+      id: 'id039',
+      imgURL: 'https://example.com/image28.jpg',
+      text: 'Spring',
+    },
+    {
+      id: 'id040',
+      imgURL: 'https://example.com/image29.jpg',
+      text: 'Summer',
+    },
+    {
+      id: 'id041',
+      imgURL: 'https://example.com/image30.jpg',
+      text: 'Autumn',
+    },
+  ]);
   const searchBarRef = useRef<TextInput>(null);
-
   useEffect(() => {
-    focused ? searchBarRef.current?.focus() : searchBarRef.current?.blur();
+    focused||search.length>0 ? searchBarRef.current?.focus() : searchBarRef.current?.blur();
   }, [focused]);
 
   const renderItem = ({ item }: { item: { id: string, imgURL: string, text: string } }) => (
     <TouchableOpacity key={item.id} style={styles.itemContainer} onPress={() => handleSelection(item.text)}>
-      <Image source={{ uri: item.imgURL }} style={styles.image} />
-      <Text style={styles.text}>{item.text}</Text>
+      <Image source={{ uri: data[Math.floor(Math.random() * data.length)].imgURL }} style={styles.image} />
+      <View style={styles.overlay} />
+      <Text style={styles.text} numberOfLines={1} ellipsizeMode="tail">{item.text}</Text>
     </TouchableOpacity>
   );
 
@@ -33,6 +198,9 @@ export default function SearchScreen() {
     setSearch(text);
     // make search action
   };
+  const handleRemove=(id:string)=>{
+   setSearchHistory(searchHistory.filter(e => e.id !== id))
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -52,8 +220,8 @@ export default function SearchScreen() {
             {search.length === 0 ? (
               <FontAwesomeIcon icon={faCamera} style={styles.icon} />
             ) : (
-              <TouchableOpacity onPress={()=>setSearch('')}>
-                <FontAwesomeIcon icon={faCircleXmark} style={styles.icon}/>
+              <TouchableOpacity onPress={() => setSearch('')}>
+                <FontAwesomeIcon icon={faCircleXmark} style={{ ...styles.icon, opacity: 0.9 }} />
               </TouchableOpacity>
             )}
           </View>
@@ -88,24 +256,34 @@ export default function SearchScreen() {
         )}
         {focused && (
           <View>
-            {filteredData(forYou.concat(popularOnPinterest)).slice(0, 6).map(item => (
-              <TouchableOpacity key={item.id} onPress={() => handleSelection(item.text)} style={styles.searchItem}>
-                <FontAwesomeIcon icon={faMagnifyingGlass} size={24} color="#000" style={styles.searchIcon} />
+          {filteredData(searchHistory).slice(0, search.length==0?20:6).map(item => (
+            <TouchableOpacity key={item.id} onPress={() => handleSelection(item.text)} style={styles.searchItem}>
+              <FontAwesomeIcon icon={faMagnifyingGlass} size={15} color="#000" style={styles.searchIcon} />
+              <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
                 <Text style={styles.searchText} numberOfLines={1} ellipsizeMode="tail">{item.text}</Text>
-              </TouchableOpacity>
-            ))}
-            {filteredData(data).slice(0,6).map(item => (
-              <TouchableOpacity key={item.id} onPress={() => handleSelection(item.text)} style={styles.searchItem}>
-                <Image source={{ uri: item.imgURL }} style={styles.searchImage} />
-                <View>
-                  <Text style={styles.searchText} numberOfLines={1} ellipsizeMode="tail">{item.text}</Text>
-                  <Text style={styles.smallSearchText} numberOfLines={1} ellipsizeMode="tail">{item.text}</Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-            <Text style={styles.suggestionText}>Looking for ideas you saved?</Text>
-            <Button title="Search your pins" buttonStyle={styles.myPinsButton} onPress={() => {/* handle press */}} />
-          </View>
+                {search.length==0&&
+                <TouchableOpacity onPress={() => handleRemove(item.id)}>
+                  <FontAwesomeIcon icon={faXmark} size={20} color='gray' />
+                </TouchableOpacity>
+                }
+              </View>
+            </TouchableOpacity>
+          ))}
+
+          {search.length > 0 && filteredData(data).slice(0, 6).map(item => (
+            <TouchableOpacity key={item.id} onPress={() => handleSelection(item.text)} style={styles.searchItem}>
+              <Image source={{ uri: item.imgURL }} style={styles.searchImage} />
+              <View>
+                <Text style={styles.searchText} numberOfLines={1} ellipsizeMode="tail">{item.text}</Text>
+                <Text style={styles.smallSearchText} numberOfLines={1} ellipsizeMode="tail">{item.text}</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+          <Text style={styles.suggestionText}>Looking for ideas you saved?</Text>
+          <Link href={'/saved'} asChild>
+          <Button title="Search your pins" buttonStyle={styles.myPinsButton} onPress={() => {/* handle press */}} />
+          </Link>
+        </View>
         )}
       </View>
     </SafeAreaView>
@@ -115,7 +293,6 @@ export default function SearchScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    paddingTop: 20,
     backgroundColor: '#FFFFFF',
   },
   container: {
@@ -144,6 +321,7 @@ const styles = StyleSheet.create({
   },
   icon: {
     padding: 10,
+    opacity: 0.8
   },
   cancelButton: {
     backgroundColor: 'transparent',
@@ -152,6 +330,7 @@ const styles = StyleSheet.create({
   cancelButtonContainer: {},
   cancelButtonText: {
     color: 'black',
+    fontSize: 18
   },
   header: {
     fontSize: 18,
@@ -171,6 +350,11 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 10,
   },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    borderRadius: 10,
+  },
   text: {
     textAlign: 'center',
     position: 'absolute',
@@ -188,11 +372,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
   },
   searchIcon: {
-    marginRight: 10,
+    marginRight: 15,
   },
   searchText: {
+    flex: 1,
     fontSize: 18,
     color: '#333',
+    fontWeight: 'bold',
+    paddingHorizontal: 10,
   },
   smallSearchText: {
     fontSize: 14,
@@ -220,7 +407,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     alignSelf: 'center',
   },
+  scrollViewContent: {
+    paddingBottom: 20,
+  },
 });
+
 
 
 
@@ -229,152 +420,7 @@ interface Pin {
   imgURL: string;
   text: string;
 }
-const data: Pin[] = [
-  {
-    id: "id123",
-    imgURL:
-      "https://ii1.pepperfry.com/media/catalog/product/m/o/568x625/modern-chaise-lounger-in-grey-colour-by-dreamzz-furniture-modern-chaise-lounger-in-grey-colour-by-dr-tmnirx.jpg",
-    text: "Pioneer LHS Chaise Lounger in Grey Colour",
-  },
-  {
-    id: "id124",
-    imgURL:
-      "https://www.precedent-furniture.com/sites/precedent-furniture.com/files/styles/header_slideshow/public/3360_SL%20CR.jpg?itok=3Ltk6red",
-    text: "Precedant Furniture",
-  },
-  {
-    id: "id125",
-    imgURL:
-      "https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/leverette-fabric-queen-upholstered-platform-bed-1594829293.jpg",
-    text: "Leverette Upholstered Platform Bed",
-  },
-  {
-    id: "id126",
-    imgURL:
-      "https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/briget-side-table-1582143245.jpg?crop=1.00xw:0.770xh;0,0.129xh&resize=768:*",
-    text: "Briget Accent Table",
-  },
-  {
-    id: "id127",
-    imgURL:
-      "https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/rivet-emerly-media-console-1610578756.jpg?crop=1xw:1xh;center,top&resize=768:*",
-    text: "Rivet Emerly Media Console",
-  },
-  {
-    id: "id128",
-    imgURL:
-      "https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/drew-barrymore-flower-home-petal-chair-1594829759.jpeg?crop=1xw:1xh;center,top&resize=768:*",
-    text: "Drew Barrymore Flower Home Accent Chair",
-  },
-  {
-    id: "id129",
-    imgURL:
-      "https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/goodee-ecobirdy-charlie-chairs-1594834221.jpg?crop=1xw:1xh;center,top&resize=768:*",
-    text: "Ecobirdy Charlie Chair",
-  },
-  {
-    id: "id130",
-    imgURL:
-      "https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/hailey-sofa-1571430947.jpg?crop=0.481xw:0.722xh;0.252xw,0.173xh&resize=768:*",
-    text: "Hailey Sofa",
-  },
-  {
-    id: "id131",
-    imgURL:
-      "https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/archer-home-designs-dining-table-1594830125.jpg?crop=0.657xw:1.00xh;0.0986xw,0&resize=768:*",
-    text: "Farmhouse Dining Table",
-  },
-  {
-    id: "id132",
-    imgURL:
-      "https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/evelyn-coffee-table-1610578857.jpeg?crop=1xw:1xh;center,top&resize=768:*",
-    text: "Evelyn Coffee Table",
-  },
-  {
-    id: "id133",
-    imgURL:
-      "https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/burrow-nomad-sofa-1594837995.jpg?crop=1xw:1xh;center,top&resize=768:*",
-    text: "Slope Nomad Leather Sofa",
-  },
-  {
-    id: "id134",
-    imgURL:
-      "https://apicms.thestar.com.my/uploads/images/2020/02/21/570850.jpg",
-    text: "Chair and Table",
-  },
-  {
-    id: "id223",
-    imgURL:
-      "https://ii1.pepperfry.com/media/catalog/product/m/o/568x625/modern-chaise-lounger-in-grey-colour-by-dreamzz-furniture-modern-chaise-lounger-in-grey-colour-by-dr-tmnirx.jpg",
-    text: "Pioneer LHS Chaise Lounger in Grey Colour",
-  },
-  {
-    id: "id224",
-    imgURL:
-      "https://www.precedent-furniture.com/sites/precedent-furniture.com/files/styles/header_slideshow/public/3360_SL%20CR.jpg?itok=3Ltk6red",
-    text: "Precedant Furniture",
-  },
-  {
-    id: "id225",
-    imgURL:
-      "https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/leverette-fabric-queen-upholstered-platform-bed-1594829293.jpg",
-    text: "Leverette Upholstered Platform Bed",
-  },
-  {
-    id: "id226",
-    imgURL:
-      "https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/briget-side-table-1582143245.jpg?crop=1.00xw:0.770xh;0,0.129xh&resize=768:*",
-    text: "Briget Accent Table",
-  },
-  {
-    id: "id227",
-    imgURL:
-      "https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/rivet-emerly-media-console-1610578756.jpg?crop=1xw:1xh;center,top&resize=768:*",
-    text: "Rivet Emerly Media Console",
-  },
-  {
-    id: "id228",
-    imgURL:
-      "https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/drew-barrymore-flower-home-petal-chair-1594829759.jpeg?crop=1xw:1xh;center,top&resize=768:*",
-    text: "Drew Barrymore Flower Home Accent Chair",
-  },
-  {
-    id: "id229",
-    imgURL:
-      "https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/goodee-ecobirdy-charlie-chairs-1594834221.jpg?crop=1xw:1xh;center,top&resize=768:*",
-    text: "Ecobirdy Charlie Chair",
-  },
-  {
-    id: "id230",
-    imgURL:
-      "https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/hailey-sofa-1571430947.jpg?crop=0.481xw:0.722xh;0.252xw,0.173xh&resize=768:*",
-    text: "Hailey Sofa",
-  },
-  {
-    id: "id231",
-    imgURL:
-      "https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/archer-home-designs-dining-table-1594830125.jpg?crop=0.657xw:1.00xh;0.0986xw,0&resize=768:*",
-    text: "Farmhouse Dining Table",
-  },
-  {
-    id: "id232",
-    imgURL:
-      "https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/evelyn-coffee-table-1610578857.jpeg?crop=1xw:1xh;center,top&resize=768:*",
-    text: "Evelyn Coffee Table",
-  },
-  {
-    id: "id233",
-    imgURL:
-      "https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/burrow-nomad-sofa-1594837995.jpg?crop=1xw:1xh;center,top&resize=768:*",
-    text: "Slope Nomad Leather Sofa",
-  },
-  {
-    id: "id234",
-    imgURL:
-      "https://apicms.thestar.com.my/uploads/images/2020/02/21/570850.jpg",
-    text: "Chair and Table",
-  },
-];
+
 const popularOnPinterest: Pin[] = [
   {
     id: 'id001',
@@ -406,11 +452,11 @@ const popularOnPinterest: Pin[] = [
     imgURL: 'https://ii1.pepperfry.com/media/catalog/product/m/o/568x625/modern-chaise-lounger-in-grey-colour-by-dreamzz-furniture-modern-chaise-lounger-in-grey-colour-by-dr-tmnirx.jpg',
     text: 'Art',
   },
-];
-const forYou: Pin[] = [
+]
+const forYou:Pin[]=[
   {
     id: 'id007',
-    imgURL: 'https://ii1.pepperfry.com/media/catalog/product/m/o/568x625/modern-chaise-lounger-in-grey-colour-by-dreamzz-furniture-modern-chaise-lounger-in-grey-colour-by-dr-tmnirx.jpg',
+    imgURL: 'https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/drew-barrymore-flower-home-petal-chair-1594829759.jpeg?crop=1xw:1xh;center,top&resize=768:*',
     text: 'Cats',
   },
   {
@@ -418,4 +464,4 @@ const forYou: Pin[] = [
     imgURL: 'https://ii1.pepperfry.com/media/catalog/product/m/o/568x625/modern-chaise-lounger-in-grey-colour-by-dreamzz-furniture-modern-chaise-lounger-in-grey-colour-by-dr-tmnirx.jpg',
     text: 'Dogs',
   },
-];
+]
