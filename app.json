@@ -13,7 +13,16 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist":{
+       "LSApplicationQueriesSchemes": [
+          "instagram",
+          "twitter",
+          "whatsapp",
+          "whatsapp-messenger",
+          "fb"
+        ]
+      }
     },
     "android": {
       "adaptiveIcon": {

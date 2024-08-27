@@ -1,27 +1,27 @@
-import EditScreenInfo from "@/components/EditScreenInfo";
 import type { FC, ReactElement } from "react";
 import {
   Image,
-  SafeAreaView,
   StatusBar,
   Text,
   View,
   useColorScheme,
   TouchableOpacity,
-  Modal,
   StyleSheet,
   Share,
-  Linking,
   Alert,
-  NativeModules,
+  ScrollView,
+  Pressable,
 } from "react-native";
 import React, { useEffect, useMemo, useState } from "react";
 import type { ListRenderItemInfo, StyleProp, ViewStyle } from "react-native";
-
+import * as Linking from "expo-linking";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 import MasonryList from "@react-native-seoul/masonry-list";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-// import DeviceInfo from "react-native-device-info";
+import { FontAwesome6, MaterialCommunityIcons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { LinearGradient } from "expo-linear-gradient";
+import Divider from "@/components/Devider";
+import Modal from "react-native-modal";
 
 interface Pin {
   id: string;
@@ -185,21 +185,39 @@ const ShareMenu = ({
   onClose: () => void;
   item: Pin;
 }) => {
-  const [isWhatsAppInstalled, setWhatsAppInstalled] = useState(false);
-  const [isMessengerInstalled, setMessengerInstalled] = useState(false);
+  // const [isWhatsAppInstalled, setWhatsAppInstalled] = useState(false);
+  // const [isMessengerInstalled, setMessengerInstalled] = useState(false);
+
+  const isDarkMode = useColorScheme() === "dark";
+  const sizeIcon = 45;
+  const textColor = isDarkMode ? "white" : "black";
 
   useEffect(() => {
     const checkAppsAvailability = async () => {
       try {
         // const whatsappSupported = "tel://1234567890";
-        const whatsappSupported = await Linking.canOpenURL("instagram://app");
-        console.log("WhatsApp Supported: ", whatsappSupported);
+        // AppLink.maybeOpenURL(url, { appName, appStoreId, appStoreLocale, playStoreId })
+        // const whatsappSupported = await AppLink.maybeOpenURL(
+        //   "whatsapp://send?text=helloworld",
+        //   {
+        //     appName: "whatsapp-messenger",
+        //     appStoreId: 389801252, // iOS App Store ID for WhatsApp
+        //     appStoreLocale: "us", // Locale for iOS App Store
+        //     playStoreId: "com.whatsapp", // Google Play Store ID for WhatsApp
+        //   }
+        // ).then(() => {
+        //   console.log("WhatsApp Supported");
+        // });
+        const whatsappSupported = await Linking.canOpenURL(
+          "whatsapp://send?phone=3464478983"
+        );
+        console.log(whatsappSupported);
 
-        const messengerSupported = await Linking.canOpenURL("fb://profile");
-        console.log("Messenger Supported: ", messengerSupported);
-
-        setWhatsAppInstalled(whatsappSupported);
-        setMessengerInstalled(messengerSupported);
+        // console.log("WhatsApp Supported: ", whatsappSupported);
+        // const messengerSupported = await Linking.canOpenURL("fb://profile");
+        // console.log("Messenger Supported: ", messengerSupported);
+        // setWhatsAppInstalled(whatsappSupported);
+        // setMessengerInstalled(messengerSupported);
       } catch (error) {
         console.error("Error checking app availability:", error);
       }
@@ -235,45 +253,198 @@ const ShareMenu = ({
   };
 
   return (
-    <Modal visible={visible} transparent={true} animationType="slide">
-      <View style={styles.modalOverlay}>
-        <View style={styles.menuContainer}>
-          {isWhatsAppInstalled && (
+    <Modal
+      isVisible={visible}
+      presentationStyle="overFullScreen"
+      swipeDirection="down"
+      onSwipeComplete={() => onClose()}
+      animationOut="slideOutDown"
+      propagateSwipe
+      style={{ justifyContent: "flex-end", margin: 0 }}
+    >
+      {/* <View style={styles.modalOverlay}> */}
+      <View
+        style={{
+          borderTopLeftRadius: 12,
+          borderTopRightRadius: 12,
+          padding: 20,
+          backgroundColor: isDarkMode ? "#333333" : Colors.lighter,
+        }}
+      >
+        {/* {isWhatsAppInstalled && ( */}
+        <Text
+          style={{
+            textAlign: "center",
+            fontWeight: "bold",
+            color: isDarkMode ? "white" : "black",
+          }}
+        >
+          Share
+        </Text>
+        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+          <View style={{ flex: 1, flexDirection: "row", gap: 15 }}>
             <TouchableOpacity
               style={styles.menuItem}
               onPress={handleWhatsAppShare}
             >
-              <MaterialCommunityIcons name="whatsapp" size={24} color="green" />
-              <Text style={styles.menuItemText}>Поделиться в WhatsApp</Text>
+              <View
+                style={{
+                  backgroundColor: "#25D366",
+                  borderRadius: 30,
+                  padding: 8,
+                }}
+              >
+                <MaterialCommunityIcons
+                  name="whatsapp"
+                  size={sizeIcon}
+                  color="white"
+                />
+              </View>
+
+              <Text style={{ color: textColor }}>WhatsApp</Text>
             </TouchableOpacity>
-          )}
-          {isMessengerInstalled && (
+            {/* )} */}
+            {/* {isMessengerInstalled && ( */}
             <TouchableOpacity
               style={styles.menuItem}
               onPress={handleMessengerShare}
             >
-              <MaterialCommunityIcons
-                name="facebook-messenger"
-                size={24}
-                color="blue"
-              />
-              <Text style={styles.menuItemText}>Поделиться в Messenger</Text>
+              <View
+                style={{
+                  backgroundColor: "white",
+                  borderRadius: 30,
+                  shadowColor: "black",
+                  shadowOffset: { width: 0, height: 0 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 3,
+                  padding: 8,
+                }}
+              >
+                <MaterialCommunityIcons
+                  name="facebook-messenger"
+                  size={sizeIcon}
+                  color="#00B2FF"
+                />
+              </View>
+              <Text style={{ color: textColor }}>Messenger</Text>
             </TouchableOpacity>
-          )}
-          <TouchableOpacity style={styles.menuItem} onPress={handleShare}>
-            <MaterialCommunityIcons
-              name="share-variant"
-              size={24}
-              color="black"
-            />
-            <Text style={styles.menuItemText}>Другие варианты</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <Text style={styles.closeButtonText}>Закрыть</Text>
-          </TouchableOpacity>
+            {/* )} */}
+            <TouchableOpacity style={styles.menuItem} onPress={handleShare}>
+              <View
+                style={{
+                  // backgroundColor: "#25D366",
+                  borderRadius: 30,
+                  // backgroundColor: "#1877F2",
+                  padding: 0,
+                }}
+              >
+                <MaterialCommunityIcons
+                  name="facebook"
+                  size={sizeIcon + 16}
+                  color="#1877F2"
+                />
+              </View>
+              <Text style={{ color: textColor }}>Facebook</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.menuItem} onPress={handleShare}>
+              <View
+                style={{
+                  backgroundColor: "white",
+                  borderRadius: 30,
+                  shadowColor: "black",
+                  shadowOffset: { width: 0, height: 0 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 3,
+                  padding: 8,
+                }}
+              >
+                <FontAwesome6 name="x-twitter" size={sizeIcon} color="#000" />
+              </View>
+              <Text style={{ color: textColor }}>X</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.menuItem} onPress={handleShare}>
+              <View>
+                <LinearGradient
+                  // Button Linear Gradient
+                  colors={["#6228d7", "#ee2a7b", "#f9ce34"]}
+                  start={{ x: 1.0, y: 0.0 }}
+                  end={{ x: 1.0, y: 0.8 }}
+                  style={{
+                    backgroundColor: "white",
+                    borderRadius: 30,
+                    shadowColor: "black",
+                    shadowOffset: { width: 0, height: 0 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 3,
+                    padding: 8,
+                    paddingHorizontal: 12,
+                  }}
+                >
+                  <FontAwesome6
+                    name="instagram"
+                    size={sizeIcon}
+                    color="white"
+                  />
+                </LinearGradient>
+              </View>
+              <Text style={{ color: textColor }}>Instagram</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.menuItem} onPress={handleShare}>
+              <View
+                style={{
+                  backgroundColor: "gray",
+                  borderRadius: 30,
+                  padding: 8,
+                }}
+              >
+                <MaterialCommunityIcons
+                  name="dots-horizontal"
+                  size={sizeIcon}
+                  color="white"
+                />
+              </View>
+
+              <Text style={styles.menuItemText}>More Apps</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+        <Divider />
+        <View
+          style={{
+            flexDirection: "column",
+            justifyContent: "space-around",
+            gap: 20,
+            paddingVertical: 25,
+          }}
+        >
+          <Text style={{ color: textColor }}>
+            This Pin was inspired by your recent activity
+          </Text>
+          <Pressable>
+            <Text
+              style={{ fontWeight: "bold", fontSize: 20, color: textColor }}
+            >
+              Hide
+            </Text>
+          </Pressable>
+          <Pressable>
+            <Text
+              style={{ fontWeight: "bold", fontSize: 20, color: textColor }}
+            >
+              Report
+            </Text>
+          </Pressable>
         </View>
+
+        <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+          <Text style={styles.closeButtonText}>Close</Text>
+        </TouchableOpacity>
       </View>
+      {/* </View> */}
     </Modal>
+    // </GestureRecognizer>
   );
 };
 
@@ -414,16 +585,12 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "flex-end",
   },
-  menuContainer: {
-    backgroundColor: "#fff",
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
-    padding: 20,
-  },
+
   menuItem: {
-    flexDirection: "row",
+    flexDirection: "column",
     alignItems: "center",
-    paddingVertical: 12,
+    paddingVertical: 5,
+    gap: 5,
   },
   menuItemText: {
     marginLeft: 10,
@@ -432,9 +599,16 @@ const styles = StyleSheet.create({
   closeButton: {
     marginTop: 10,
     alignItems: "center",
+    width: 80,
+    margin: "auto",
+    backgroundColor: "gray",
+    borderRadius: 100,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
   },
   closeButtonText: {
     fontSize: 16,
-    color: "blue",
+    color: "white",
+    fontWeight: "bold",
   },
 });
