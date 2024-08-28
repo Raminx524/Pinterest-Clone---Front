@@ -14,6 +14,13 @@ import { useColorScheme } from "@/components/useColorScheme";
 import { AuthContext, AuthContextProvider } from "@/context/authContext";
 import React, { useContext } from "react";
 import { View, ActivityIndicator } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { firebase } from "@react-native-firebase/auth";
+import { firebaseConfig } from "@/config/firebaseConfig";
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 
 export { ErrorBoundary } from "expo-router";
 
@@ -81,23 +88,23 @@ function RootLayoutNav() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          {/* <Stack.Screen name="(tabs)/create" options={{ headerShown: false }} /> */}
-          <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-          <Stack.Screen
-            name="detail"
-            options={{
-              presentation: "transparentModal",
-              headerShown: false,
-              gestureEnabled: true,
-              // animation: "fade",
-              fullScreenGestureEnabled: true,
-              animationTypeForReplace: "pop",
-              // customAnimationOnGesture:
-            }}
-          />
-        </Stack>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        {/* <Stack.Screen name="(tabs)/create" options={{ headerShown: false }} /> */}
+        <Stack.Screen name="modal" options={{ presentation: "modal" }} />
+        <Stack.Screen
+          name="detail"
+          options={{
+            presentation: "transparentModal",
+            headerShown: false,
+            gestureEnabled: true,
+            // animation: "fade",
+            fullScreenGestureEnabled: true,
+            animationTypeForReplace: "pop",
+            // customAnimationOnGesture:
+          }}
+        />
+      </Stack>
     </GestureHandlerRootView>
   );
 }
