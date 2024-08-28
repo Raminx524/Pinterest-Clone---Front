@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>455291391605-por3d7p7l2b69o0f0qnaj9hm6bogdh0o.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.455291391605-por3d7p7l2b69o0f0qnaj9hm6bogdh0o</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCDuj4N4dDY85-HgHR6yaxGelJoM44SMG0</string>
+	<key>GCM_SENDER_ID</key>
+	<string>455291391605</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.pinterestclone.ramin</string>
+	<key>PROJECT_ID</key>
+	<string>pinterest-clone-e96b0</string>
+	<key>STORAGE_BUCKET</key>
+	<string>pinterest-clone-e96b0.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:455291391605:ios:124462630e3e0ff2def23c</string>
+	<key>DATABASE_URL</key>
+	<string>https://pinterest-clone-e96b0-default-rtdb.europe-west1.firebasedatabase.app</string>
+</dict>
+</plist>

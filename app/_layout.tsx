@@ -5,25 +5,22 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { useRouter, Stack, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
 
 import { useColorScheme } from "@/components/useColorScheme";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { AuthContext, AuthContextProvider } from "@/context/authContext";
+import React, { useContext } from "react";
+import { View, ActivityIndicator } from "react-native";
 
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from "expo-router";
+export { ErrorBoundary } from "expo-router";
 
 export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
   initialRouteName: "(tabs)",
 };
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -32,7 +29,6 @@ export default function RootLayout() {
     ...FontAwesome.font,
   });
 
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
   }, [error]);
@@ -43,19 +39,48 @@ export default function RootLayout() {
     }
   }, [loaded]);
 
+  const colorScheme = useColorScheme(); // Ensure this is not conditionally used
+
   if (!loaded) {
     return null;
   }
 
-  return <RootLayoutNav />;
+  return (
+    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+      <AuthContextProvider>
+        <RootLayoutNav />
+      </AuthContextProvider>
+    </ThemeProvider>
+  );
 }
 
 function RootLayoutNav() {
-  const colorScheme = useColorScheme();
+  const { user, loading } = useContext(AuthContext);
+  const router = useRouter();
+  const segments = useSegments();
+  useEffect(() => {
+    if (!loading) {
+      const inTabsGroup = segments[0] === "(tabs)";
+      const inAuthGroup = segments[0].startsWith("(auth)");
+
+      if (user && !inTabsGroup) {
+        router.replace("/(tabs)");
+      } else if (!user && !inAuthGroup) {
+        router.replace("/(auth)/authIndex");
+      }
+    }
+  }, [user, loading, segments]);
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           {/* <Stack.Screen name="(tabs)/create" options={{ headerShown: false }} /> */}
@@ -73,7 +98,6 @@ function RootLayoutNav() {
             }}
           />
         </Stack>
-      </ThemeProvider>
     </GestureHandlerRootView>
   );
 }

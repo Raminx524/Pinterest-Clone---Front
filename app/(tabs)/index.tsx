@@ -26,6 +26,7 @@ import Modal from "react-native-modal";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 import { router, useNavigation } from "expo-router";
 
+
 export interface Pin {
   id: string;
   imgURL: string;
@@ -466,6 +467,27 @@ export default function TabOneScreen() {
 
   return (
     <View style={backgroundStyle}>
+      {/* Temp Log Out Btn */}
+      <TouchableOpacity
+        onPress={async () => {
+          try {
+            await auth().signOut();
+            router.replace("/(auth)/authIndex");
+          } catch (err) {
+            console.log(err);
+          }
+        }}
+        style={{
+          backgroundColor: "#000",
+          justifyContent: "center",
+          alignItems: "center",
+          zIndex: 99,
+          width: 150,
+          height: 50,
+        }}
+      >
+        <Text style={{ color: "#fff", textAlign: "center" }}>Log Out</Text>
+      </TouchableOpacity>
       {/* <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} /> */}
       <MasonryList
         keyExtractor={(item: Pin): string => item.id}
