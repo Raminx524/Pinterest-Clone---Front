@@ -80,9 +80,24 @@ function RootLayoutNav() {
   }
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-    </Stack>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          {/* <Stack.Screen name="(tabs)/create" options={{ headerShown: false }} /> */}
+          <Stack.Screen name="modal" options={{ presentation: "modal" }} />
+          <Stack.Screen
+            name="detail"
+            options={{
+              presentation: "transparentModal",
+              headerShown: false,
+              gestureEnabled: true,
+              // animation: "fade",
+              fullScreenGestureEnabled: true,
+              animationTypeForReplace: "pop",
+              // customAnimationOnGesture:
+            }}
+          />
+        </Stack>
+    </GestureHandlerRootView>
   );
 }

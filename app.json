@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "pinterestFinal",
-    "slug": "pinterestFinal",
+    "name": "pinterest",
+    "slug": "pinterest",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -53,6 +53,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "2322515c-6ce7-43b6-a158-a9942eff5978"
+      }
     }
   }
 }
