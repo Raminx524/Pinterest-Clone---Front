@@ -4,6 +4,8 @@
 node_modules/
 
 secret.ts
+android/
+%ProgramData%/
 
 # Expo
 .expo/
