@@ -22,6 +22,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import Divider from "@/components/Devider";
 import Modal from "react-native-modal";
+import { Button } from "react-native-elements/dist/buttons/Button";
+import auth from "@react-native-firebase/auth";
+import { router } from "expo-router";
 
 export interface Pin {
   id: string;
@@ -535,6 +538,27 @@ export default function TabOneScreen() {
 
   return (
     <SafeAreaView style={backgroundStyle}>
+      {/* Temp Log Out Btn */}
+      <TouchableOpacity
+        onPress={async () => {
+          try {
+            await auth().signOut();
+            router.replace("/(auth)/authIndex");
+          } catch (err) {
+            console.log(err);
+          }
+        }}
+        style={{
+          backgroundColor: "#000",
+          justifyContent: "center",
+          alignItems: "center",
+          zIndex: 99,
+          width: 150,
+          height: 50,
+        }}
+      >
+        <Text style={{ color: "#fff", textAlign: "center" }}>Log Out</Text>
+      </TouchableOpacity>
       {/* <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} /> */}
       <MasonryList
         keyExtractor={(item: Pin): string => item.id}

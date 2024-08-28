@@ -13,22 +13,26 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
+      "googleServicesFile": "./GoogleService-Info.plist",
       "supportsTablet": true,
-      "infoPlist":{
-       "LSApplicationQueriesSchemes": [
+      "infoPlist": {
+        "LSApplicationQueriesSchemes": [
           "instagram",
           "twitter",
           "whatsapp",
           "whatsapp-messenger",
           "fb"
         ]
-      }
+      },
+      "bundleIdentifier": "com.pinterestclone.ramin"
     },
     "android": {
+      "googleServicesFile": "google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.pinterestclone.ramin"
     },
     "web": {
       "bundler": "metro",
@@ -36,7 +40,16 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "@react-native-firebase/app",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
