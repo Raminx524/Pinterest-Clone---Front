@@ -50,6 +50,7 @@ export default function TabLayout() {
             <FontAwesome name="search" size={24} color={color} />
           ),
         }}
+        
       />
 
       <Tabs.Screen
