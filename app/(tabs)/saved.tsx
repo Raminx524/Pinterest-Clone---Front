@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   SafeAreaView,
   StyleSheet,
@@ -25,6 +25,13 @@ export default function SavedScreen() {
   const [viewOption, setViewOption] = useState<"Default" | "Wide" | "Compact">("Default");
 
   const scrollViewRef = useRef<ScrollView>(null);
+
+  useEffect(() => {
+    if (scrollViewRef.current) {
+      const pageIndex = selectedSection === "Pins" ? 0 : 1;
+      scrollViewRef.current.scrollTo({ x: pageIndex * width, y: 0, animated: true });
+    }
+  }, [selectedSection]);
 
   const renderPins = () => (
     <ScrollView contentContainerStyle={styles.itemsContainer}>
@@ -80,10 +87,6 @@ export default function SavedScreen() {
 
   const handleSectionChange = (section: "Pins" | "Boards") => {
     setSelectedSection(section);
-    const pageIndex = section === "Pins" ? 0 : 1;
-    if (scrollViewRef.current) {
-      scrollViewRef.current.scrollTo({ x: pageIndex * width, y: 0, animated: true });
-    }
   };
 
   return (
@@ -144,9 +147,19 @@ export default function SavedScreen() {
               <TouchableOpacity style={styles.filterButton} onPress={toggleFavoriteFilter}>
                 <FontAwesome name="star" size={16} color={isFavoriteFiltered ? "#000" : "#000"} style={{ marginRight: 5 }} />
                 <Text style={[styles.filterText, isFavoriteFiltered && styles.activeFilterText]}>Favorites</Text>
+                {isFavoriteFiltered && (
+                  <TouchableOpacity onPress={toggleFavoriteFilter}>
+                    <FontAwesome name="times" size={16} color="#FF0000" style={{ marginLeft: 5 }} />
+                  </TouchableOpacity>
+                )}
               </TouchableOpacity>
               <TouchableOpacity style={styles.filterButton} onPress={toggleCreatedByYouFilter}>
                 <Text style={[styles.filterText, isCreatedByYouFiltered && styles.activeFilterText]}>Created by You</Text>
+                {isCreatedByYouFiltered && (
+                  <TouchableOpacity onPress={toggleCreatedByYouFilter}>
+                    <FontAwesome name="times" size={16} color="#FF0000" style={{ marginLeft: 5 }} />
+                  </TouchableOpacity>
+                )}
               </TouchableOpacity>
             </View>
             {renderPins()}
@@ -160,6 +173,11 @@ export default function SavedScreen() {
               </TouchableOpacity>
               <TouchableOpacity style={styles.filterButton} onPress={toggleGroupFilter}>
                 <Text style={[styles.filterText, isGroupFiltered && styles.activeFilterText]}>Group</Text>
+                {isGroupFiltered && (
+                  <TouchableOpacity onPress={toggleGroupFilter}>
+                    <FontAwesome name="times" size={16} color="#FF0000" style={{ marginLeft: 5 }} />
+                  </TouchableOpacity>
+                )}
               </TouchableOpacity>
             </View>
             {renderBoards()}
@@ -202,13 +220,22 @@ export default function SavedScreen() {
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <Text style={styles.modalHeader}>View Options</Text>
-              <TouchableOpacity style={styles.modalOption} onPress={() => { setViewOption("Wide"); setViewOptionsVisible(false); }}>
-                <Text style={styles.modalOptionText}>Wide</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.modalOption} onPress={() => { setViewOption("Default"); setViewOptionsVisible(false); }}>
+              <TouchableOpacity style={styles.modalOption} onPress={() => {
+                setViewOption("Default");
+                setViewOptionsVisible(false);
+              }}>
                 <Text style={styles.modalOptionText}>Default</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.modalOption} onPress={() => { setViewOption("Compact"); setViewOptionsVisible(false); }}>
+              <TouchableOpacity style={styles.modalOption} onPress={() => {
+                setViewOption("Wide");
+                setViewOptionsVisible(false);
+              }}>
+                <Text style={styles.modalOptionText}>Wide</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.modalOption} onPress={() => {
+                setViewOption("Compact");
+                setViewOptionsVisible(false);
+              }}>
                 <Text style={styles.modalOptionText}>Compact</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.modalCloseButton} onPress={() => setViewOptionsVisible(false)}>
@@ -257,12 +284,11 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     backgroundColor: "transparent",
-    borderRadius: 20,
   },
   selectedButton: {
     backgroundColor: "transparent",
     borderBottomWidth: 2,
-    borderBottomColor: "#E60023",
+    borderBottomColor: "#000",
   },
   buttonText: {
     color: "#000000",
@@ -313,7 +339,6 @@ const styles = StyleSheet.create({
     marginBottom: 7,
   },
   filterText: {
-    fontSize: 13,
     color: "#000000",
   },
   activeFilterText: {
@@ -333,7 +358,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   defaultPin: {
-    width: (width - 80) / 2,
+    width: (width - 62) / 2,
     height: (width - 50) / 2,
     margin: 5,
     borderRadius: 10,
@@ -342,16 +367,16 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   savedBoard: {
-    width: 100,
-    height: 100,
-    margin: 10,
+    width: (width - 74) / 3,
+    height: (width - 60) / 3,
+    margin: 5,
     borderRadius: 10,
     borderColor: "#E1E1E1",
     borderWidth: 1,
     backgroundColor: "#fff",
   },
   widePin: {
-    width: width - 80,
+    width: width - 53,
     height: 200,
     margin: 5,
     borderRadius: 10,
@@ -360,7 +385,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   compactPin: {
-    width: (width - 90) / 3,
+    width: (width - 74) / 3,
     height: (width - 60) / 3,
     margin: 5,
     borderRadius: 10,
