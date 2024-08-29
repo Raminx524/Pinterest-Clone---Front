@@ -8,10 +8,22 @@ import { color } from 'react-native-elements/dist/helpers';
 import { data } from './index';
 import { Link } from 'expo-router';
 import {fetchSearchHistory,addToHistory,deleteFromHistory } from './searchApi';
+
 export default function SearchScreen() {
   const [search, setSearch] = useState<string>('');
   const [focused, setFocused] = useState<boolean>(false);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
+  const [searchsuggest, setSearchHistory] = useState<string[]>([]);
+  
+  useEffect(() => {
+    const loadSearchHistory = async () => {
+      const history = await fetchSearchHistory();
+      setSearchHistory(history);
+    };
+    
+    loadSearchHistory();
+  }, []);
+  
   useEffect(() => {
     const loadSearchHistory = async () => {
       const history = await fetchSearchHistory();
