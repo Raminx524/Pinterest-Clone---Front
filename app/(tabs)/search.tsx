@@ -13,17 +13,6 @@ export default function SearchScreen() {
   const [search, setSearch] = useState<string>('');
   const [focused, setFocused] = useState<boolean>(false);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
-  const [searchsuggest, setSearchHistory] = useState<string[]>([]);
-  
-  useEffect(() => {
-    const loadSearchHistory = async () => {
-      const history = await fetchSearchHistory();
-      setSearchHistory(history);
-    };
-    
-    loadSearchHistory();
-  }, []);
-  
   useEffect(() => {
     const loadSearchHistory = async () => {
       const history = await fetchSearchHistory();
