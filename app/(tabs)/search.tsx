@@ -11,23 +11,27 @@ export default function SearchScreen() {
   const [search, setSearch] = useState<string>('');
   const [focused, setFocused] = useState<boolean>(false);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
-  useEffect(() => {
 
-    console.log(1);
-    const loadSearchHistory = async () => {
-      console.log(2);
-      
-      const history = await fetchSearchHistory();
-      console.log(3);
-      setSearchHistory(history);
-    };
-    
-    loadSearchHistory();
-  }, []);
+  
   const searchBarRef = useRef<TextInput>(null);
   useEffect(() => {
-    focused||search.length>0 ? searchBarRef.current?.focus() : searchBarRef.current?.blur();
-  }, [focused]);
+    if (focused || search.length > 0) {
+      searchBarRef.current?.focus();
+      
+      const loadSearchHistory = async () => {
+        try {
+          const history = await fetchSearchHistory();
+          setSearchHistory(history);
+        } catch (error) {
+          console.error('Failed to load search history:', error);
+        }
+      };
+      loadSearchHistory();
+    } else {
+      searchBarRef.current?.blur();
+    }
+  }, [focused, search.length]); // Added search.length as a dependency
+  
 
    const renderItem = ({ item }: { item: { id: string, imgURL: string, text: string } }) => (
      <TouchableOpacity key={item.id} style={styles.itemContainer} onPress={() => handleSelection(item.text)}>
@@ -54,6 +58,7 @@ export default function SearchScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
+        {/* search bar component */}
         <View style={styles.searchContainer}>
           <View style={styles.searchBarContainer}>
             {!focused && <FontAwesomeIcon icon={faMagnifyingGlass} style={styles.icon} />}
@@ -87,6 +92,7 @@ export default function SearchScreen() {
             />
           )}
         </View>
+        {/* suggestion for you */}
         {!focused && (
           <View>
             <Text style={styles.header}>Ideas for you</Text>
@@ -105,6 +111,7 @@ export default function SearchScreen() {
             />
           </View>
         )}
+        {/* search resaukts */}
         {focused && (
           <ScrollView keyboardShouldPersistTaps="handled">
             {search.length === 0 &&
@@ -122,23 +129,25 @@ export default function SearchScreen() {
               ))
             }
 
-            {search.length > 0 && (
-            <>
-              {categories.slice(0, 6).map(item => (
-                item.toLowerCase().includes(search.toLowerCase()) && (
-                  <TouchableOpacity key={item} onPress={() => handleSelection(item)} style={styles.searchItem}>
-                    <FontAwesomeIcon icon={faMagnifyingGlass} size={15} color="#000" style={styles.searchIcon} />
-                    <Text style={styles.searchText} numberOfLines={1} ellipsizeMode="tail">{item}</Text>
-                  </TouchableOpacity>
-                )
-              ))}
+              {search.length > 0 && (
+                <>
+                  {categories
+                    .filter(item => item.toLowerCase().includes(search.toLowerCase())) // Filter the categories based on the search term
+                    .slice(0, 6) 
+                    .map(item => (
+                      <TouchableOpacity key={item} onPress={() => handleSelection(item)} style={styles.searchItem}>
+                        <FontAwesomeIcon icon={faMagnifyingGlass} size={15} color="#000" style={styles.searchIcon} />
+                        <Text style={styles.searchText} numberOfLines={1} ellipsizeMode="tail">{item}</Text>
+                      </TouchableOpacity>
+                    ))
+                  }
 
-              <Text style={styles.suggestionText}>Looking for ideas you saved?</Text>
-              <Link href={`/saved?search=${encodeURIComponent(search)}`} asChild>
-                <Button title="Search your pins" buttonStyle={styles.myPinsButton} onPress={() => {/* handle press */}} />
-              </Link>
-            </>
-          )}
+                  <Text style={styles.suggestionText}>Looking for ideas you saved?</Text>
+                  <Link href={`/saved?search=${encodeURIComponent(search)}`} asChild>
+                    <Button title="Search your pins" buttonStyle={styles.myPinsButton} onPress={() => {/* handle press */}} />
+                  </Link>
+                </>
+              )}
           </ScrollView>
         )}
       </View>
@@ -276,7 +285,6 @@ interface Pin {
   imgURL: string;
   text: string;
 }
-
 const popularOnPinterest: Pin[] = [
   {
     id: 'id001',
