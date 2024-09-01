@@ -12,6 +12,10 @@ config/
 .expo/
 dist/
 web-build/
+secret.ts
+android/
+%ProgramData%/
+config/
 
 # Native
 *.orig.*

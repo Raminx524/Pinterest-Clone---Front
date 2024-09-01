@@ -67,10 +67,11 @@ function RootLayoutNav() {
   const segments = useSegments();
   useEffect(() => {
     if (!loading) {
-      const inTabsGroup = segments[0] === "(tabs)";
+
+      // const inTabsGroup = segments[0] === "(tabs)";
       const inAuthGroup = segments[0].startsWith("(auth)");
 
-      if (user && !inTabsGroup) {
+      if (user && inAuthGroup) {
         router.replace("/(tabs)");
       } else if (!user && !inAuthGroup) {
         router.replace("/(auth)/authIndex");
