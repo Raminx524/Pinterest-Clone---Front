@@ -1,11 +1,12 @@
 import React from "react";
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
-import auth from "@react-native-firebase/auth";
+import auth, { firebase } from "@react-native-firebase/auth";
 import { styles } from "@/styles/authRegisterStyles";
 import ProgressIndicator from "@/components/registerBullets";
 import { useRegisterData } from "@/context/registerContext";
 import { FontAwesome5 } from "@expo/vector-icons";
+import axios from "axios";
 
 const TOPICS = [
   "Art",
@@ -38,19 +39,31 @@ export default function Topics() {
 
   const handleFinishRegistration = async () => {
     try {
-      console.log({ registerData });
+      const userCred = await auth().createUserWithEmailAndPassword(
+        registerData.email,
+        registerData.password
+      );
+      console.log(userCred);
 
-      // Here you would typically create the user in Firebase
-      // For this example, we'll just sign in the user
-      // In a real app, you'd collect all the information from previous steps
-      //* await auth().createUserWithEmailAndPassword(
-      //*   "example@email.com",
-      //*   "password"
-      //* );
-      // You might want to save the selected topics to the user's profile here
-      //* router.replace("/(tabs)");
+      const newUserData = {
+        firebaseUid: userCred.user.uid,
+        email: registerData.email,
+        username: registerData.fullName,
+        avatar: "",
+        dob: registerData.dob,
+        gender: registerData.gender,
+        country: registerData.country,
+        topics: registerData.topics,
+      };
+      const res = await axios.post(
+        "http://10.0.2.2:3000/api/user",
+        newUserData
+      );
+      console.log(res);
+
+      router.replace("/(tabs)");
     } catch (error) {
-      console.error("Registration error:", error);
+      console.error("Registration error:", { error });
     }
   };
 
