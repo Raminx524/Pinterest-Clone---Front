@@ -12,18 +12,31 @@ import { useRouter } from "expo-router";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { useRegisterData } from "@/context/registerContext";
 import { secrets } from "@/secret";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { LinearGradient } from "expo-linear-gradient";
+import { FontAwesome6 } from "@expo/vector-icons";
+import RegisterError, { IValidationError } from "@/components/RegisterError";
 
 const AuthIndex = () => {
   const [email, setEmail] = useState("");
-  const { registerData, setRegisterData } = useRegisterData();
+  const [error, setError] = useState<IValidationError | null>(null);
+  const { setRegisterData } = useRegisterData();
   const router = useRouter();
   GoogleSignin.configure({
     webClientId: secrets.googleWebClient,
   });
 
   const validateEmail = () => {
+    if (email === "") {
+      setError({ message: "Please enter your email" });
+      return false;
+    }
     const reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
-    return reg.test(email);
+    const isValid = reg.test(email);
+    if (!isValid) {
+      setError({ message: "Sorry, this doesn't look like a valid email" });
+    }
+    return isValid;
   };
 
   const checkEmailExists = async () => {
@@ -39,7 +52,6 @@ const AuthIndex = () => {
 
   const continueHandler = async () => {
     if (!validateEmail()) {
-      console.log("Invalid Email entered");
       return;
     }
     setRegisterData((prev) => {
@@ -80,32 +92,49 @@ const AuthIndex = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <View
-        style={{
-          position: "relative",
-          top: -28,
-          alignItems: "center",
-          gap: 10,
-        }}
-      >
+    <SafeAreaView style={styles.container}>
+      <Image
+        source={require("@/assets/images/authBG.gif")}
+        style={styles.backgroundImage}
+      />
+      <View style={styles.headerContainer}>
+        <LinearGradient
+          colors={["rgba(255,255,255,0)", "rgba(255,255,255,1)"]}
+          style={styles.gradientOverlay}
+          locations={[0.2, 0.4]} // This sets the gradient to be 20% transparent and 80% white
+        />
         <Image
-          style={{ height: 85, width: 85 }}
+          style={styles.logo}
           source={require("@/assets/images/pinterest-logo-8561DDA2E1-seeklogo.com.png")}
           resizeMode="contain"
         />
-        <Text style={{ fontSize: 28, fontWeight: 700 }}>
-          Welcome to Pinterest
-        </Text>
+        <Text style={styles.welcomeText}>Welcome to Pinterest</Text>
       </View>
       <View style={{ gap: 22 }}>
         <View style={{ gap: 16 }}>
-          <TextInput
-            placeholder="Email address"
-            style={styles.input}
-            value={email}
-            onChangeText={setEmail}
-          />
+          <View style={{ position: "relative", marginBottom: 15 }}>
+            <TextInput
+              placeholder="Email address"
+              style={error ? [styles.input, styles.errorInput] : styles.input}
+              value={email}
+              onChangeText={(txt) => {
+                setEmail(txt);
+                setError(null);
+              }}
+            />
+            {email !== "" && (
+              <FontAwesome6
+                name="circle-xmark"
+                style={
+                  error
+                    ? [styles.clearIcon, styles.errorIcon]
+                    : styles.clearIcon
+                }
+                onPress={() => setEmail("")}
+              />
+            )}
+            {error && <RegisterError error={error} />}
+          </View>
           <TouchableOpacity style={styles.button} onPress={continueHandler}>
             <Text style={styles.buttonText}>Continue</Text>
           </TouchableOpacity>
@@ -137,7 +166,7 @@ const AuthIndex = () => {
           </Text>
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -147,6 +176,42 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     alignItems: "center",
     padding: 8,
+    paddingTop: 30,
+    overflow: "hidden",
+    backgroundColor: "#fff",
+  },
+  gradientOverlay: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: -25,
+    height: "60%",
+    zIndex: 1,
+  },
+  backgroundImage: {
+    marginTop: 40,
+    width: "100%",
+    height: "50%",
+    borderRadius: 15,
+  },
+  headerContainer: {
+    position: "relative",
+    width: "100%",
+    top: -28,
+    alignItems: "center",
+    gap: 10,
+    backgroundColor: "fff",
+    zIndex: 3,
+  },
+  logo: {
+    height: 85,
+    width: 85,
+    zIndex: 5,
+  },
+  welcomeText: {
+    fontSize: 28,
+    fontWeight: "700",
+    zIndex: 5,
   },
   input: {
     height: 50,
@@ -155,7 +220,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "lightgray",
     width: 350,
-    marginBottom: 15,
+    marginBottom: 4,
     borderRadius: 15,
   },
   button: {
@@ -166,6 +231,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+
   buttonText: {
     fontSize: 16,
     fontWeight: "600",
@@ -183,6 +249,28 @@ const styles = StyleSheet.create({
   themedLink: {
     color: "#1579d1",
     fontWeight: "bold",
+  },
+  errorView: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  errorText: {
+    color: "#d60021",
+    fontSize: 12,
+  },
+  errorInput: {
+    borderColor: "#d60021",
+  },
+  errorIcon: {
+    color: "#d60021",
+    fontSize: 20,
+  },
+  clearIcon: {
+    position: "absolute",
+    right: 12,
+    top: 14,
+    fontSize: 20,
   },
 });
 
