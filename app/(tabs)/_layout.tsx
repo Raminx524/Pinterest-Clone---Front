@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Link, Tabs } from "expo-router";
-import { Pressable } from "react-native";
+import { Link, Redirect, router, Tabs, useSegments } from "expo-router";
+import { ActivityIndicator, Pressable, View } from "react-native";
 
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/components/useColorScheme";
@@ -9,6 +9,7 @@ import Fontisto from "@expo/vector-icons/Fontisto";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
+import { AuthContext } from "@/context/authContext";
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -20,6 +21,14 @@ function TabBarIcon(props: {
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const { user, loading } = useContext(AuthContext);
+  if (loading)
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  if (!user) return <Redirect href="/(auth)/authIndex" />;
 
   return (
     <Tabs
@@ -50,6 +59,7 @@ export default function TabLayout() {
             <FontAwesome name="search" size={24} color={color} />
           ),
         }}
+        
       />
 
       <Tabs.Screen

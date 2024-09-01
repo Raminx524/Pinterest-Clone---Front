@@ -3,6 +3,11 @@
 # dependencies
 node_modules/
 
+secret.ts
+android/
+%ProgramData%/
+config/
+
 # Expo
 .expo/
 dist/

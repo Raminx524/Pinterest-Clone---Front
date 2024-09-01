@@ -467,6 +467,7 @@ export default function TabOneScreen() {
 
   return (
     <View style={backgroundStyle}>
+      {/* Temp Log Out Btn */}
       {/* <TouchableOpacity
         onPress={async () => {
           try {
@@ -477,8 +478,9 @@ export default function TabOneScreen() {
           }
         }}
         style={{
-          marginTop: 25,
+
           backgroundColor: "#000",
+          marginTop: 35,
           justifyContent: "center",
           alignItems: "center",
           zIndex: 99,

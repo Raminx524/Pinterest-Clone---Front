@@ -1,210 +1,64 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { StyleSheet, StatusBar, FlatList, Text, Image, TouchableOpacity, View, TextInput, ScrollView } from 'react-native';
+import { StyleSheet, StatusBar, FlatList, Text, Image, TouchableOpacity, View, TextInput, ScrollView, LogBox } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from 'react-native-elements';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCamera, faCircleXmark, faMagnifyingGlass, faXmark } from '@fortawesome/free-solid-svg-icons';
-import { color } from 'react-native-elements/dist/helpers';
-import { data } from './index';
 import { Link } from 'expo-router';
+import {fetchSearchHistory,addToHistory,deleteFromHistory } from '../../utils/searchApi';
 
 export default function SearchScreen() {
   const [search, setSearch] = useState<string>('');
   const [focused, setFocused] = useState<boolean>(false);
-  const [searchHistory, setSearchHistory] = useState<Pin[]>([
-    {
-      id: 'id010',
-      imgURL: 'https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/drew-barrymore-flower-home-petal-chair-1594829759.jpeg?crop=1xw:1xh;center,top&resize=768:*',
-      text: 'Cats',
-    },
-    {
-      id: 'id011',
-      imgURL: 'https://ii1.pepperfry.com/media/catalog/product/m/o/568x625/modern-chaise-lounger-in-grey-colour-by-dreamzz-furniture-modern-chaise-lounger-in-grey-colour-by-dr-tmnirx.jpg',
-      text: 'Dogs',
-    },
-    {
-      id: 'id012',
-      imgURL: 'https://example.com/image1.jpg',
-      text: 'Nature',
-    },
-    {
-      id: 'id013',
-      imgURL: 'https://example.com/image2.jpg',
-      text: 'Travel',
-    },
-    {
-      id: 'id014',
-      imgURL: 'https://example.com/image3.jpg',
-      text: 'Food',
-    },
-    {
-      id: 'id015',
-      imgURL: 'https://example.com/image4.jpg',
-      text: 'Fashion',
-    },
-    {
-      id: 'id016',
-      imgURL: 'https://example.com/image5.jpg',
-      text: 'Technology',
-    },
-    {
-      id: 'id017',
-      imgURL: 'https://example.com/image6.jpg',
-      text: 'Fitness',
-    },
-    {
-      id: 'id018',
-      imgURL: 'https://example.com/image7.jpg',
-      text: 'Art',
-    },
-    {
-      id: 'id019',
-      imgURL: 'https://example.com/image8.jpg',
-      text: 'Photography',
-    },
-    {
-      id: 'id020',
-      imgURL: 'https://example.com/image9.jpg',
-      text: 'Home Decor',
-    },
-    {
-      id: 'id021',
-      imgURL: 'https://example.com/image10.jpg',
-      text: 'DIY',
-    },
-    {
-      id: 'id022',
-      imgURL: 'https://example.com/image11.jpg',
-      text: 'Gardening',
-    },
-    {
-      id: 'id023',
-      imgURL: 'https://example.com/image12.jpg',
-      text: 'Recipes',
-    },
-    {
-      id: 'id024',
-      imgURL: 'https://example.com/image13.jpg',
-      text: 'Architecture',
-    },
-    {
-      id: 'id025',
-      imgURL: 'https://example.com/image14.jpg',
-      text: 'Music',
-    },
-    {
-      id: 'id026',
-      imgURL: 'https://example.com/image15.jpg',
-      text: 'Movies',
-    },
-    {
-      id: 'id027',
-      imgURL: 'https://example.com/image16.jpg',
-      text: 'Sports',
-    },
-    {
-      id: 'id028',
-      imgURL: 'https://example.com/image17.jpg',
-      text: 'Education',
-    },
-    {
-      id: 'id029',
-      imgURL: 'https://example.com/image18.jpg',
-      text: 'Science',
-    },
-    {
-      id: 'id030',
-      imgURL: 'https://example.com/image19.jpg',
-      text: 'Animals',
-    },
-    {
-      id: 'id031',
-      imgURL: 'https://example.com/image20.jpg',
-      text: 'Events',
-    },
-    {
-      id: 'id032',
-      imgURL: 'https://example.com/image21.jpg',
-      text: 'Weddings',
-    },
-    {
-      id: 'id033',
-      imgURL: 'https://example.com/image22.jpg',
-      text: 'Lifestyle',
-    },
-    {
-      id: 'id034',
-      imgURL: 'https://example.com/image23.jpg',
-      text: 'Travel Tips',
-    },
-    {
-      id: 'id035',
-      imgURL: 'https://example.com/image24.jpg',
-      text: 'Kids',
-    },
-    {
-      id: 'id036',
-      imgURL: 'https://example.com/image25.jpg',
-      text: 'Camping',
-    },
-    {
-      id: 'id037',
-      imgURL: 'https://example.com/image26.jpg',
-      text: 'Beach',
-    },
-    {
-      id: 'id038',
-      imgURL: 'https://example.com/image27.jpg',
-      text: 'Winter',
-    },
-    {
-      id: 'id039',
-      imgURL: 'https://example.com/image28.jpg',
-      text: 'Spring',
-    },
-    {
-      id: 'id040',
-      imgURL: 'https://example.com/image29.jpg',
-      text: 'Summer',
-    },
-    {
-      id: 'id041',
-      imgURL: 'https://example.com/image30.jpg',
-      text: 'Autumn',
-    },
-  ]);
+  const [searchHistory, setSearchHistory] = useState<string[]>([]);
+
+  
   const searchBarRef = useRef<TextInput>(null);
   useEffect(() => {
-    focused||search.length>0 ? searchBarRef.current?.focus() : searchBarRef.current?.blur();
-  }, [focused]);
+    if (focused || search.length > 0) {
+      searchBarRef.current?.focus();
+      
+      const loadSearchHistory = async () => {
+        try {
+          const history = await fetchSearchHistory();
+          setSearchHistory(history);
+        } catch (error) {
+          console.error('Failed to load search history:', error);
+        }
+      };
+      loadSearchHistory();
+    } else {
+      searchBarRef.current?.blur();
+    }
+  }, [focused, search.length]); // Added search.length as a dependency
+  
 
-  const renderItem = ({ item }: { item: { id: string, imgURL: string, text: string } }) => (
-    <TouchableOpacity key={item.id} style={styles.itemContainer} onPress={() => handleSelection(item.text)}>
-      <Image source={{ uri: data[Math.floor(Math.random() * data.length)].imgURL }} style={styles.image} />
-      <View style={styles.overlay} />
-      <Text style={styles.text} numberOfLines={1} ellipsizeMode="tail">{item.text}</Text>
-    </TouchableOpacity>
-  );
-
-  const filteredData = (data: any[]) =>
-    data.filter(item => item.text.toLowerCase().includes(search.toLowerCase()));
+   const renderItem = ({ item }: { item: { id: string, imgURL: string, text: string } }) => (
+     <TouchableOpacity key={item.id} style={styles.itemContainer} onPress={() => handleSelection(item.text)}>
+       <Image source={{ uri:item.imgURL }} style={styles.image} />
+       <View style={styles.overlay} />
+       <Text style={styles.text} numberOfLines={1} ellipsizeMode="tail">{item.text}</Text>
+     </TouchableOpacity>
+   );
 
   const handleCancel = () => {
     setSearch('');
     setFocused(false);
   };
 
-  const handleSelection = (text: string) => {
-    setSearch(text);
+  const handleSelection = (search: string) => {
+    setSearch(search);
+    addToHistory(search)
     // make search action
   };
-  const handleRemove=(id:string)=>{
-   setSearchHistory(searchHistory.filter(e => e.id !== id))
+  const handleRemove=(search:string)=>{
+   setSearchHistory(searchHistory.filter(e => e !== search))
+   deleteFromHistory(search)
   }
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
+        {/* search bar component */}
         <View style={styles.searchContainer}>
           <View style={styles.searchBarContainer}>
             {!focused && <FontAwesomeIcon icon={faMagnifyingGlass} style={styles.icon} />}
@@ -216,6 +70,8 @@ export default function SearchScreen() {
               ref={searchBarRef}
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
+              onSubmitEditing={() => handleSelection(search)}
+
             />
             {search.length === 0 ? (
               <FontAwesomeIcon icon={faCamera} style={styles.icon} />
@@ -236,6 +92,7 @@ export default function SearchScreen() {
             />
           )}
         </View>
+        {/* suggestion for you */}
         {!focused && (
           <View>
             <Text style={styles.header}>Ideas for you</Text>
@@ -254,36 +111,44 @@ export default function SearchScreen() {
             />
           </View>
         )}
+        {/* search resaukts */}
         {focused && (
-          <ScrollView>
-          {filteredData(searchHistory).slice(0, search.length==0?20:6).map(item => (
-            <TouchableOpacity key={item.id} onPress={() => handleSelection(item.text)} style={styles.searchItem}>
-              <FontAwesomeIcon icon={faMagnifyingGlass} size={15} color="#000" style={styles.searchIcon} />
-              <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={styles.searchText} numberOfLines={1} ellipsizeMode="tail">{item.text}</Text>
-                {search.length==0&&
-                <TouchableOpacity onPress={() => handleRemove(item.id)}>
-                  <FontAwesomeIcon icon={faXmark} size={20} color='gray' />
+          <ScrollView keyboardShouldPersistTaps="handled">
+            {search.length === 0 &&
+              searchHistory.slice(0, 20).map(item => (
+                item.toLowerCase().includes(search.toLowerCase()) &&
+                <TouchableOpacity key={item} onPress={() => handleSelection(item)} style={styles.searchItem}>
+                  <FontAwesomeIcon icon={faMagnifyingGlass} size={15} color="#000" style={styles.searchIcon} />
+                  <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+                    <Text style={styles.searchText} numberOfLines={1} ellipsizeMode="tail">{item}</Text>
+                    <TouchableOpacity onPress={() => handleRemove(item)}>
+                      <FontAwesomeIcon icon={faXmark} size={20} color='gray' />
+                    </TouchableOpacity>
+                  </View>
                 </TouchableOpacity>
-                }
-              </View>
-            </TouchableOpacity>
-          ))}
+              ))
+            }
 
-          {search.length > 0 && filteredData(data).slice(0, 6).map(item => (
-            <TouchableOpacity key={item.id} onPress={() => handleSelection(item.text)} style={styles.searchItem}>
-              <Image source={{ uri: item.imgURL }} style={styles.searchImage} />
-              <View>
-                <Text style={styles.searchText} numberOfLines={1} ellipsizeMode="tail">{item.text}</Text>
-                <Text style={styles.smallSearchText} numberOfLines={1} ellipsizeMode="tail">{item.text}</Text>
-              </View>
-            </TouchableOpacity>
-          ))}
-          <Text style={styles.suggestionText}>Looking for ideas you saved?</Text>
-          <Link href={'/saved'} asChild>
-          <Button title="Search your pins" buttonStyle={styles.myPinsButton} onPress={() => {/* handle press */}} />
-          </Link>
-        </ScrollView>
+              {search.length > 0 && (
+                <>
+                  {categories
+                    .filter(item => item.toLowerCase().includes(search.toLowerCase())) // Filter the categories based on the search term
+                    .slice(0, 6) 
+                    .map(item => (
+                      <TouchableOpacity key={item} onPress={() => handleSelection(item)} style={styles.searchItem}>
+                        <FontAwesomeIcon icon={faMagnifyingGlass} size={15} color="#000" style={styles.searchIcon} />
+                        <Text style={styles.searchText} numberOfLines={1} ellipsizeMode="tail">{item}</Text>
+                      </TouchableOpacity>
+                    ))
+                  }
+
+                  <Text style={styles.suggestionText}>Looking for ideas you saved?</Text>
+                  <Link href={`/saved?search=${encodeURIComponent(search)}`} asChild>
+                    <Button title="Search your pins" buttonStyle={styles.myPinsButton} onPress={() => {/* handle press */}} />
+                  </Link>
+                </>
+              )}
+          </ScrollView>
         )}
       </View>
     </SafeAreaView>
@@ -420,7 +285,6 @@ interface Pin {
   imgURL: string;
   text: string;
 }
-
 const popularOnPinterest: Pin[] = [
   {
     id: 'id001',
@@ -465,3 +329,4 @@ const forYou:Pin[]=[
     text: 'Dogs',
   },
 ]
+const categories:string[] = ["Art","Science","Technology","Health","Education","Sports","Travel","Food","Fashion","Finance","Music","Movies","Books","History","Photography","Design","Marketing","Business","Real Estate","Fitness","Nature","Animals","Gaming","Politics","Religion","Philosophy","Psychology","Parenting","Relationships","Environment","Social Media","Startups","Programming","DIY","Crafts","Home Decor","Gardening","Cooking","Baking","Architecture","Automotive","Aerospace","Astronomy","Biotechnology","Chemistry","Physics","Mathematics","Artificial Intelligence","Blockchain","Cryptocurrency","Augmented Reality","Virtual Reality","E-commerce","Investing","Insurance","Accounting","Entrepreneurship","Leadership","Management","Sales","Customer Service","Human Resources","Recruiting","Networking","Public Relations","Event Planning","Project Management","Supply Chain","Logistics","Manufacturing","Quality Control","Sustainability","Agriculture","Forestry","Fishing","Renewable Energy","Oil & Gas","Mining","Aviation","Maritime","Telecommunications","Media","Journalism","Advertising","Copywriting","SEO","Content Marketing","Influencer Marketing","Affiliate Marketing","Email Marketing","Branding","Graphic Design","Web Design","UX/UI","Interior Design","Product Design","Fashion Design","Jewelry Design","Textile Design","Industrial Design"];
