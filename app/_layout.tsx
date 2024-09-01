@@ -17,6 +17,7 @@ import { View, ActivityIndicator } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { firebase } from "@react-native-firebase/auth";
 import { firebaseConfig } from "@/config/firebaseConfig";
+import { PinContextProvider } from "@/context/pinContext";
 
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
@@ -54,9 +55,11 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <AuthContextProvider>
-        <RootLayoutNav />
-      </AuthContextProvider>
+      <PinContextProvider>
+        <AuthContextProvider>
+          <RootLayoutNav />
+        </AuthContextProvider>
+      </PinContextProvider>
     </ThemeProvider>
   );
 }
@@ -67,9 +70,8 @@ function RootLayoutNav() {
   const segments = useSegments();
   useEffect(() => {
     if (!loading) {
-
       // const inTabsGroup = segments[0] === "(tabs)";
-      const inAuthGroup = segments[0].startsWith("(auth)");
+      const inAuthGroup = segments[0]?.startsWith("(auth)");
 
       if (user && inAuthGroup) {
         router.replace("/(tabs)");
@@ -92,7 +94,6 @@ function RootLayoutNav() {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         {/* <Stack.Screen name="(tabs)/create" options={{ headerShown: false }} /> */}
-        <Stack.Screen name="modal" options={{ presentation: "modal" }} />
         <Stack.Screen
           name="detail"
           options={{
@@ -101,7 +102,9 @@ function RootLayoutNav() {
             gestureEnabled: true,
             // animation: "fade",
             fullScreenGestureEnabled: true,
-            animationTypeForReplace: "pop",
+            animationTypeForReplace: "push",
+            // animation: "slide_from_bottom",
+
             // customAnimationOnGesture:
           }}
         />

@@ -1,7 +1,7 @@
 import { StatusBar } from "expo-status-bar";
-import { Dimensions, Platform, StyleSheet } from "react-native";
+import { Dimensions, Image, Linking, Platform, StyleSheet } from "react-native";
 import { Text, View } from "@/components/Themed";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import {
   Gesture,
   GestureDetector,
@@ -13,18 +13,28 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import React, { useEffect, useState } from "react";
-
+import { usePinContext } from "@/context/pinContext";
+import { FullWindowOverlay } from "react-native-screens";
+import { Overlay } from "react-native-elements/dist/overlay/Overlay";
 const { width: screenWidth } = Dimensions.get("window");
 
 export default function Detail() {
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
-
   const threshold = 50;
   const initialMoveDown = useSharedValue(false);
   const horizontalMoveDetected = useSharedValue(false);
   const leftMoveDetected = useSharedValue(false);
   const rightMoveDetected = useSharedValue(false);
+  const searchParams = useLocalSearchParams();
+  const [heightImage, setHeightImage] = useState(300);
+  const [isHasImage, setHasImage] = useState(true);
+
+  const [currentPinId, setCurrentPinId] = useState(searchParams.currentId);
+  // const [currentPin, setCurrentPin] = useState(null);
+  // const [previousPin, setPreviousPin] = useState(null);
+  // const [nextPin, setNextPin] = useState(null);
+  const { getCurrentPin, getPrevPin, getNextPin } = usePinContext();
 
   const [slides, setSlides] = useState([
     {
@@ -47,12 +57,48 @@ export default function Detail() {
   useEffect(() => {
     console.log("useEffect");
 
-    console.log("data");
-    console.log("slide0", slides[0].position.value, slides[0].key);
-    console.log("slide1", slides[1].position.value, slides[1].key);
-    console.log("slide2", slides[2].position.value, slides[2].key);
-    console.log("translateX", translateX.value);
-  }, [slides]);
+    function getPrevNextCurrentPin() {
+      setSlides((prevSlides) => {
+        const left = prevSlides[0];
+        const current = prevSlides[1];
+        const right = prevSlides[2];
+
+        const currentPin = getCurrentPin(currentPinId);
+        const prevPin = getPrevPin(currentPinId);
+        const nextPin = getNextPin(currentPinId);
+
+        return [
+          { ...left, ...prevPin },
+          { ...current, ...currentPin },
+          { ...right, ...nextPin },
+        ];
+      });
+      async function getSize() {
+        try {
+          const res = await Linking.canOpenURL(slides[1].image);
+
+          if (!res) {
+            setHasImage(false);
+          } else {
+            Image.getSize(slides[1].image, (width, height) => {
+              // const CARD_WIDTH = Metrics.screenWidth * 0.64;
+              // const scale = Math.min(width / 100, height / 100);
+              const screenWidth = Dimensions.get("window").width;
+              const newWidth = (screenWidth - 50) * 0.5;
+              const newHeight = (newWidth / width) * height;
+
+              setHeightImage(height);
+            });
+          }
+        } catch (e) {
+          console.error("Error getting image size:", e);
+        }
+      }
+      getSize();
+      getCurrentPin(currentPinId);
+    }
+    getPrevNextCurrentPin();
+  }, [currentPinId]);
 
   const pan = Gesture.Pan()
     .runOnJS(true)
@@ -122,6 +168,8 @@ export default function Detail() {
           left.position.value = withSpring(0);
           current.position.value = withSpring(screenWidth);
 
+          setCurrentPinId(left.id);
+
           return [
             { ...right, position: right.position },
             { ...left, position: left.position },
@@ -133,7 +181,6 @@ export default function Detail() {
         translateX.value < -threshold
       ) {
         console.log("translate right");
-        console.log(slides);
 
         setSlides((prevSlides) => {
           const left = prevSlides[0];
@@ -144,6 +191,8 @@ export default function Detail() {
           right.position.value = withSpring(0);
           left.position.value = screenWidth;
 
+          setCurrentPinId(right.id);
+
           return [
             { ...current, position: current.position },
             { ...right, position: right.position },
@@ -153,6 +202,7 @@ export default function Detail() {
       }
 
       translateX.value = withSpring(0);
+      translateY.value = withSpring(0);
     });
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -161,8 +211,11 @@ export default function Detail() {
       { translateY: translateY.value },
     ],
   }));
+
   return (
     <GestureDetector gesture={pan}>
+      {/* <View style={styles.overlay}></View> */}
+
       <Animated.View style={[styles.modalContainer, animatedStyle]}>
         {slides.map((slide) => (
           <Animated.View
@@ -174,7 +227,16 @@ export default function Detail() {
               })),
             ]}
           >
-            <Text>{slide.content}</Text>
+            <Image
+              source={{ uri: slide.image }}
+              style={{
+                height: heightImage,
+                alignSelf: "stretch",
+                borderRadius: 20,
+              }}
+              resizeMode="stretch"
+            />
+            <Text>{slide.content + slide.id}</Text>
             <TouchableOpacity onPress={() => router.push("/detail")}>
               <Text>push</Text>
             </TouchableOpacity>
@@ -192,21 +254,30 @@ export default function Detail() {
 }
 
 const styles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: -10,
+  },
   modalContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    marginTop: 50,
   },
   modalContent: {
     position: "absolute",
-
-    width: 300,
-    height: 300,
+    top: 0,
     backgroundColor: "white",
     borderRadius: 20,
-    padding: 20,
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 1,
+    // paddingTop: 50,
+
+    // padding: 20,
+    // justifyContent: "center",
+    // alignItems: "center",
+    // zIndex: 1,
+    height: "100%",
+    width: "100%",
   },
 });

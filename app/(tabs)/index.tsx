@@ -12,6 +12,7 @@ import {
   ScrollView,
   Pressable,
   Dimensions,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useMemo, useState } from "react";
 import type { ListRenderItemInfo, StyleProp, ViewStyle } from "react-native";
@@ -26,6 +27,7 @@ import Modal from "react-native-modal";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 import { router, useNavigation } from "expo-router";
 import auth from "@react-native-firebase/auth";
+import { usePinContext } from "@/context/pinContext";
 
 export interface Pin {
   id: string;
@@ -363,7 +365,7 @@ const PinCard: FC<{ item: Pin; style: StyleProp<ViewStyle> }> = ({
     return (
       <TouchableOpacity
         onPress={() => {
-          router.push({ pathname: "/detail" });
+          router.push({ pathname: "/detail", params: { currentId: item.id } });
         }}
       >
         <View key={item.id} style={[{ marginTop: 5, flex: 1, gap: 0 }, style]}>
@@ -425,31 +427,7 @@ const PinCard: FC<{ item: Pin; style: StyleProp<ViewStyle> }> = ({
 
 export default function TabOneScreen() {
   const isDarkMode = useColorScheme() === "dark";
-  const [data, setData] = useState<Pin[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  // const [flagLoad, setFlagLoad] = useState(false);
-  // const isDarkMode = false;
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        let link =
-          "https://66d09bc0181d059277df2c5f.mockapi.io/api/pin?limit=10&page=" +
-          currentPage;
-
-        console.log(link);
-        console.log((currentPage - 1) * 10 + 1);
-
-        const response = await fetch(link);
-        const json = await response.json();
-
-        setData([...data, ...json]);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    fetchData();
-  }, [currentPage]);
+  const { pins, setPins, currentPage, setCurrentPage } = usePinContext();
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -490,32 +468,32 @@ export default function TabOneScreen() {
         <Text style={{ color: "#fff", textAlign: "center" }}>Log Out</Text>
       </TouchableOpacity>
       {/* <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} /> */}
-      <MasonryList
-        keyExtractor={(item: Pin): string => item.id}
-        ListHeaderComponent={<View />}
-        contentContainerStyle={{
-          paddingHorizontal: 20,
-          paddingTop: 50,
-          alignSelf: "stretch",
-        }}
-        onEndReached={() => (this.callOnScrollEnd = true)}
-        onMomentumScrollEnd={() => {
-          this.callOnScrollEnd && loadMore();
-          this.callOnScrollEnd = false;
-        }}
-        // onEndReached={() => {
-        //   // console.log("End reached");
-        //   console.log(this.onEndReachedCalledDuringMomentum);
-
-        //   if (!this.onEndReachedCalledDuringMomentum) {
-        //     loadMore();
-        //     this.onEndReachedCalledDuringMomentum = true;
-        //   }
-        // }}
-        numColumns={2}
-        data={data}
-        renderItem={renderItem as any}
-      />
+      {pins ? (
+        <MasonryList
+          keyExtractor={(item: Pin): string => item.id}
+          ListHeaderComponent={<View />}
+          contentContainerStyle={{
+            paddingHorizontal: 20,
+            paddingTop: 50,
+            alignSelf: "stretch",
+          }}
+          onEndReached={() => (this.callOnScrollEnd = true)}
+          onMomentumScrollEnd={() => {
+            console.log("End reached");
+            this.callOnScrollEnd && loadMore();
+            this.callOnScrollEnd = false;
+          }}
+          numColumns={2}
+          data={pins}
+          renderItem={renderItem as any}
+        />
+      ) : (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <ActivityIndicator size="large" color="#000" />
+        </View>
+      )}
     </View>
   );
 }
