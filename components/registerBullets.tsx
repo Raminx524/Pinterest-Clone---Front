@@ -17,7 +17,9 @@ export default function ProgressIndicator({
           key={index}
           style={[
             styles.bullet,
-            index < currentStep ? styles.activeBullet : styles.inactiveBullet,
+            index === currentStep - 1
+              ? styles.activeBullet
+              : styles.inactiveBullet,
           ]}
         />
       ))}
@@ -30,18 +32,22 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 15,
   },
   bullet: {
-    width: 10,
-    height: 10,
+    width: 6,
+    height: 6,
     borderRadius: 5,
     marginHorizontal: 5,
   },
   activeBullet: {
-    backgroundColor: "red",
+    backgroundColor: "white",
+    height: 7,
+    width: 7,
+    borderWidth: 2,
+    borderColor: "#000",
   },
   inactiveBullet: {
-    backgroundColor: "lightgray",
+    backgroundColor: "black",
   },
 });

@@ -5,6 +5,7 @@ import auth from "@react-native-firebase/auth";
 import { styles } from "@/styles/authRegisterStyles";
 import ProgressIndicator from "@/components/registerBullets";
 import { useRegisterData } from "@/context/registerContext";
+import { FontAwesome5 } from "@expo/vector-icons";
 
 const TOPICS = [
   "Art",
@@ -61,25 +62,28 @@ export default function Topics() {
   };
   return (
     <View style={styles.container}>
-      <ProgressIndicator totalSteps={7} currentStep={7} />
-      <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-        <Text style={styles.backButtonText}>Back</Text>
-      </TouchableOpacity>
-      <Text style={styles.title}>Choose your interests</Text>
-      <ScrollView style={styles.topicsContainer}>
-        {TOPICS.map((topic) => (
-          <TouchableOpacity
-            key={topic}
-            style={[
-              styles.topicButton,
-              registerData.topics.includes(topic) && styles.selectedTopicButton,
-            ]}
-            onPress={() => toggleTopic(topic)}
-          >
-            <Text style={styles.topicButtonText}>{topic}</Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+      <View>
+        <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+          <FontAwesome5 name="chevron-left" size={20} />
+        </TouchableOpacity>
+        <ProgressIndicator totalSteps={7} currentStep={7} />
+        <Text style={styles.title}>Choose your interests</Text>
+        <ScrollView style={styles.topicsContainer}>
+          {TOPICS.map((topic) => (
+            <TouchableOpacity
+              key={topic}
+              style={[
+                styles.topicButton,
+                registerData.topics.includes(topic) &&
+                  styles.selectedTopicButton,
+              ]}
+              onPress={() => toggleTopic(topic)}
+            >
+              <Text style={styles.topicButtonText}>{topic}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
       <TouchableOpacity
         style={styles.finishButton}
         onPress={handleFinishRegistration}

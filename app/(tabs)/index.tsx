@@ -25,6 +25,7 @@ import Divider from "@/components/Devider";
 import Modal from "react-native-modal";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 import { router, useNavigation } from "expo-router";
+import auth from "@react-native-firebase/auth";
 
 export interface Pin {
   id: string;
@@ -478,7 +479,7 @@ export default function TabOneScreen() {
         }}
         style={{
           backgroundColor: "#000",
-          position: "absolute",
+          marginTop: 35,
           justifyContent: "center",
           alignItems: "center",
           zIndex: 99,
