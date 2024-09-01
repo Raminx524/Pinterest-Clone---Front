@@ -25,6 +25,7 @@ import Divider from "@/components/Devider";
 import Modal from "react-native-modal";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 import { router, useNavigation } from "expo-router";
+import auth from "@react-native-firebase/auth";
 
 export interface Pin {
   id: string;
@@ -336,12 +337,12 @@ const PinCard: FC<{ item: Pin; style: StyleProp<ViewStyle> }> = ({
   useEffect(() => {
     async function getSize() {
       try {
-        const res = await Linking.canOpenURL(item.images[0]);
+        const res = await Linking.canOpenURL(item.image);
 
         if (!res) {
           setHasImage(false);
         } else {
-          Image.getSize(item.images[0], (width, height) => {
+          Image.getSize(item.image, (width, height) => {
             // const CARD_WIDTH = Metrics.screenWidth * 0.64;
             // const scale = Math.min(width / 100, height / 100);
             const screenWidth = Dimensions.get("window").width;
@@ -362,12 +363,12 @@ const PinCard: FC<{ item: Pin; style: StyleProp<ViewStyle> }> = ({
     return (
       <TouchableOpacity
         onPress={() => {
-          router.push({ pathname: "/detail", params: { productID: item.id } });
+          router.push({ pathname: "/detail" });
         }}
       >
         <View key={item.id} style={[{ marginTop: 5, flex: 1, gap: 0 }, style]}>
           <Image
-            source={{ uri: item.images[0] }}
+            source={{ uri: item.image }}
             style={{
               height: heightImage,
               alignSelf: "stretch",
@@ -433,9 +434,9 @@ export default function TabOneScreen() {
     const fetchData = async () => {
       try {
         let link =
-          "https://api.escuelajs.co/api/v1/products?offset=" +
-          ((currentPage - 1) * 10 + 1) +
-          "&limit=10";
+          "https://66d09bc0181d059277df2c5f.mockapi.io/api/pin?limit=10&page=" +
+          currentPage;
+
         console.log(link);
         console.log((currentPage - 1) * 10 + 1);
 
@@ -466,6 +467,27 @@ export default function TabOneScreen() {
 
   return (
     <View style={backgroundStyle}>
+      {/* <TouchableOpacity
+        onPress={async () => {
+          try {
+            await auth().signOut();
+            router.replace("/(auth)/authIndex");
+          } catch (err) {
+            console.log(err);
+          }
+        }}
+        style={{
+          marginTop: 25,
+          backgroundColor: "#000",
+          justifyContent: "center",
+          alignItems: "center",
+          zIndex: 99,
+          width: 150,
+          height: 50,
+        }}
+      >
+        <Text style={{ color: "#fff", textAlign: "center" }}>Log Out</Text>
+      </TouchableOpacity> */}
       {/* <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} /> */}
       <MasonryList
         keyExtractor={(item: Pin): string => item.id}

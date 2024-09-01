@@ -51,7 +51,29 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  const colorScheme = useColorScheme();
+  const { user, loading } = useContext(AuthContext);
+  const router = useRouter();
+  const segments = useSegments();
+  useEffect(() => {
+    if (!loading) {
+      // const inTabsGroup = segments[0] === "(tabs)";
+      const inAuthGroup = segments[0].startsWith("(auth)");
+
+      if (user && inAuthGroup) {
+        router.replace("/(tabs)");
+      } else if (!user && !inAuthGroup) {
+        router.replace("/(auth)/authIndex");
+      }
+    }
+  }, [user, loading, segments]);
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

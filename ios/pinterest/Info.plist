@@ -31,6 +31,12 @@
           <string>com.pinterestclone.ramin</string>
         </array>
       </dict>
+      <dict>
+        <key>CFBundleURLSchemes</key>
+        <array>
+          <string>com.googleusercontent.apps.455291391605-por3d7p7l2b69o0f0qnaj9hm6bogdh0o</string>
+        </array>
+      </dict>
     </array>
     <key>CFBundleVersion</key>
     <string>1</string>
