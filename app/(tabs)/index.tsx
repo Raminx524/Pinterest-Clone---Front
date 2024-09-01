@@ -461,14 +461,14 @@ export default function TabOneScreen() {
   };
 
   const renderItem = ({ item, i }: { item: Pin; i: number }): ReactElement => {
-    console.log(data);
+    // console.log(data);
     return <PinCard item={item} style={{ marginLeft: i % 2 === 0 ? 0 : 15 }} />;
   };
 
   return (
     <View style={backgroundStyle}>
       {/* Temp Log Out Btn */}
-      {/* <TouchableOpacity
+      <TouchableOpacity
         onPress={async () => {
           try {
             await auth().signOut();
@@ -478,7 +478,6 @@ export default function TabOneScreen() {
           }
         }}
         style={{
-
           backgroundColor: "#000",
           marginTop: 35,
           justifyContent: "center",
@@ -489,7 +488,7 @@ export default function TabOneScreen() {
         }}
       >
         <Text style={{ color: "#fff", textAlign: "center" }}>Log Out</Text>
-      </TouchableOpacity> */}
+      </TouchableOpacity>
       {/* <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} /> */}
       <MasonryList
         keyExtractor={(item: Pin): string => item.id}

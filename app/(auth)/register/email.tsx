@@ -49,6 +49,7 @@ export default function Email() {
         <Text style={styles.title}>What's your email?</Text>
         <View style={{ position: "relative", marginBottom: 15 }}>
           <TextInput
+            autoFocus={true}
             placeholder="Email address"
             style={error ? [styles.input, styles.errorInput] : styles.input}
             value={registerData.email}

@@ -16,6 +16,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesome6 } from "@expo/vector-icons";
 import RegisterError, { IValidationError } from "@/components/RegisterError";
+import axios from "axios";
 
 const AuthIndex = () => {
   const [email, setEmail] = useState("");
@@ -40,12 +41,11 @@ const AuthIndex = () => {
   };
 
   const checkEmailExists = async () => {
-    console.log({ email });
     try {
-      //axios getUserByEmail from MongoDB
-      return false; //! Change to true
-    } catch (error) {
-      console.log("Error checking email:", error);
+      await axios.get(`http://10.0.2.2:3000/api/user?email=${email}`);
+      return true;
+    } catch (error: any) {
+      if (error.status !== 404) console.log("Error checking email:", error);
       return false;
     }
   };
