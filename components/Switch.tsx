@@ -7,6 +7,7 @@ import {
   Button,
   StyleProp,
   ViewStyle,
+
 } from "react-native";
 import Animated, {
   interpolate,
@@ -16,6 +17,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+
 interface ISwitchProps {
   value: SharedValue<boolean>;
   onPress?: () => void;
@@ -32,8 +34,10 @@ export const Switch = ({
   onPress,
   style,
   duration = 400,
+
   trackColors = { on: "#000", off: "#fff" },
 }: ISwitchProps) => {
+
   const height = useSharedValue(0);
   const width = useSharedValue(0);
 

@@ -17,7 +17,7 @@ import { View, ActivityIndicator } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { firebase } from "@react-native-firebase/auth";
 import { firebaseConfig } from "@/config/firebaseConfig";
-import { PinContextProvider } from "@/context/pinContext";
+import { PinContextProvider, usePinContext } from "@/context/pinContext";
 
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
@@ -68,9 +68,9 @@ function RootLayoutNav() {
   const { user, loading } = useContext(AuthContext);
   const router = useRouter();
   const segments = useSegments();
+
   useEffect(() => {
     if (!loading) {
-      // const inTabsGroup = segments[0] === "(tabs)";
       const inAuthGroup = segments[0]?.startsWith("(auth)");
 
       if (user && inAuthGroup) {
@@ -100,12 +100,10 @@ function RootLayoutNav() {
             presentation: "transparentModal",
             headerShown: false,
             gestureEnabled: true,
-            // animation: "fade",
+            contentStyle: {
+              backgroundColor: `rgba(0, 0, 0, 0.7)`,
+            },
             fullScreenGestureEnabled: true,
-            animationTypeForReplace: "push",
-            // animation: "slide_from_bottom",
-
-            // customAnimationOnGesture:
           }}
         />
       </Stack>
