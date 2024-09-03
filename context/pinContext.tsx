@@ -6,6 +6,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import { SharedValue, useSharedValue } from "react-native-reanimated";
 
 interface PinContextProps {
   pins: Pin[] | null;
@@ -15,6 +16,9 @@ interface PinContextProps {
   getCurrentPin: (currentId: any) => Pin | null;
   getPrevPin: (currentId: any) => Pin | null;
   getNextPin: (currentId: any) => Pin | null;
+  //   opacityOverlay: number;
+  //   setOpacityOverlay: React.Dispatch<React.SetStateAction<number>>;
+  //   changeOpacity: (opacity: number) => void;
 }
 
 export const PinContext = createContext<PinContextProps>({
@@ -25,6 +29,9 @@ export const PinContext = createContext<PinContextProps>({
   getCurrentPin: (currentId: any) => null,
   getPrevPin: (currentId: any) => null,
   getNextPin: (currentId: any) => null,
+  //   opacityOverlay: 1,
+  //   setOpacityOverlay: () => null,
+  //   changeOpacity: () => null,
 });
 
 interface PinContextProviderProps {
@@ -34,6 +41,7 @@ interface PinContextProviderProps {
 export const PinContextProvider = ({ children }: PinContextProviderProps) => {
   const [pins, setPins] = useState<Pin[] | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  //   const [opacityOverlay, setOpacityOverlay] = useState(1);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -59,7 +67,7 @@ export const PinContextProvider = ({ children }: PinContextProviderProps) => {
     fetchData();
   }, [currentPage]);
 
-  const getCurrentPin = (currentId) => {
+  const getCurrentPin = (currentId: string) => {
     return pins
       ? pins.find((pin) => pin.id === currentId)
         ? pins.find((pin) => pin.id === currentId)
@@ -67,16 +75,20 @@ export const PinContextProvider = ({ children }: PinContextProviderProps) => {
       : null;
   };
 
-  const getPrevPin = (currentId) => {
+  const getPrevPin = (currentId: string) => {
     const currentIndex = pins?.findIndex((pin) => pin.id === currentId);
     const prevIndex = currentIndex - 1;
     return pins ? pins[prevIndex] : null;
   };
-  const getNextPin = (currentId) => {
+  const getNextPin = (currentId: string) => {
     const currentIndex = pins?.findIndex((pin) => pin.id === currentId);
     const nextIndex = currentIndex + 1;
     return pins ? pins[nextIndex] : null;
   };
+
+  //   const changeOpacityTab = (opacity: number) => {
+  //     setOpacityOverlay(opacity);
+  //   };
 
   return (
     <PinContext.Provider
@@ -88,6 +100,9 @@ export const PinContextProvider = ({ children }: PinContextProviderProps) => {
         getCurrentPin,
         getPrevPin,
         getNextPin,
+        // opacityOverlay,
+        // setOpacityOverlay,
+        // changeOpacity: changeOpacityTab,
       }}
     >
       {children}
