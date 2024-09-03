@@ -147,7 +147,7 @@ const AuthIndex = () => {
             <Text style={styles.buttonText}>Continue with Facebook</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={{ ...styles.button, backgroundColor: "#e6e6e6" }}
+            style={{ ...styles.button, backgroundColor: "#f2f2f2" }}
             onPress={googleHandler}
           >
             <Text style={{ ...styles.buttonText, color: "#202124" }}>
