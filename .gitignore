@@ -4,14 +4,16 @@
 node_modules/
 
 secret.ts
-android/
-%ProgramData%/
 config/
 
 # Expo
 .expo/
 dist/
 web-build/
+secret.ts
+android/
+%ProgramData%/
+config/
 
 # Native
 *.orig.*

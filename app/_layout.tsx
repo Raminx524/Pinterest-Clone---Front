@@ -17,6 +17,7 @@ import { View, ActivityIndicator } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { firebase } from "@react-native-firebase/auth";
 import { firebaseConfig } from "@/config/firebaseConfig";
+import { PinContextProvider, usePinContext } from "@/context/pinContext";
 
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
@@ -54,9 +55,11 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <AuthContextProvider>
-        <RootLayoutNav />
-      </AuthContextProvider>
+      <PinContextProvider>
+        <AuthContextProvider>
+          <RootLayoutNav />
+        </AuthContextProvider>
+      </PinContextProvider>
     </ThemeProvider>
   );
 }
@@ -65,12 +68,12 @@ function RootLayoutNav() {
   const { user, loading } = useContext(AuthContext);
   const router = useRouter();
   const segments = useSegments();
+
   useEffect(() => {
     if (!loading) {
-      const inTabsGroup = segments[0] === "(tabs)";
-      const inAuthGroup = segments[0].startsWith("(auth)");
+      const inAuthGroup = segments[0]?.startsWith("(auth)");
 
-      if (user && !inTabsGroup) {
+      if (user && inAuthGroup) {
         router.replace("/(tabs)");
       } else if (!user && !inAuthGroup) {
         router.replace("/(auth)/authIndex");
@@ -91,17 +94,16 @@ function RootLayoutNav() {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         {/* <Stack.Screen name="(tabs)/create" options={{ headerShown: false }} /> */}
-        <Stack.Screen name="modal" options={{ presentation: "modal" }} />
         <Stack.Screen
           name="detail"
           options={{
             presentation: "transparentModal",
             headerShown: false,
             gestureEnabled: true,
-            // animation: "fade",
+            contentStyle: {
+              backgroundColor: `rgba(0, 0, 0, 0.7)`,
+            },
             fullScreenGestureEnabled: true,
-            animationTypeForReplace: "pop",
-            // customAnimationOnGesture:
           }}
         />
       </Stack>

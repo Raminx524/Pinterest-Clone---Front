@@ -2,39 +2,46 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   container: {
+    width: "100%",
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "space-between",
     alignItems: "center",
     padding: 16,
+    paddingTop: 50,
   },
   title: {
-    fontSize: 24,
+    alignSelf: "center",
+    fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 20,
+    marginBottom: 10,
   },
   input: {
     height: 50,
-    width: 300,
+    width: 400,
     borderWidth: 1,
     borderColor: "gray",
-    borderRadius: 5,
+    borderRadius: 15,
     paddingHorizontal: 10,
-    marginBottom: 20,
+    marginBottom: 5,
   },
   button: {
-    backgroundColor: "lightgray",
+    backgroundColor: "#d60021",
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 25,
-    marginVertical: 5,
-    width: 200,
+    marginVertical: 2,
+    width: "100%",
     alignItems: "center",
   },
+  genderBtn: {
+    backgroundColor: "lightgray",
+    paddingVertical: 12,
+  },
   selectedButton: {
-    backgroundColor: "red",
+    backgroundColor: "#d60021",
   },
   continueButton: {
-    backgroundColor: "red",
+    backgroundColor: "#d60021",
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 25,
@@ -43,7 +50,7 @@ export const styles = StyleSheet.create({
   buttonText: {
     color: "white",
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: "500",
   },
   topicsContainer: {
     maxHeight: 300,
@@ -57,23 +64,42 @@ export const styles = StyleSheet.create({
     marginVertical: 5,
   },
   selectedTopicButton: {
-    backgroundColor: "red",
+    backgroundColor: "#d60021",
   },
   topicButtonText: {
     fontSize: 16,
   },
   finishButton: {
-    backgroundColor: "red",
+    backgroundColor: "#d60021",
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 25,
     marginTop: 20,
   },
   backButton: {
-    marginTop: 10,
+    position: "absolute",
   },
-  backButtonText: {
-    color: "blue",
-    fontSize: 16,
+  errorView: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  errorText: {
+    color: "#d60021",
+    fontSize: 12,
+  },
+  errorInput: {
+    borderColor: "#d60021",
+    borderWidth: 2,
+  },
+  errorIcon: {
+    color: "#d60021",
+    fontSize: 20,
+  },
+  clearIcon: {
+    position: "absolute",
+    right: 17,
+    top: 15,
+    fontSize: 20,
   },
 });
