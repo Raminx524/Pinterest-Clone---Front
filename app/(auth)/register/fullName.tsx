@@ -4,7 +4,7 @@ import { useRouter } from "expo-router";
 import { styles } from "@/styles/authRegisterStyles";
 import ProgressIndicator from "@/components/registerBullets";
 import { useRegisterData } from "@/context/registerContext";
-import { FontAwesome5, FontAwesome6 } from "@expo/vector-icons";
+import { AntDesign, FontAwesome5, FontAwesome6 } from "@expo/vector-icons";
 import RegisterError, { IValidationError } from "@/components/RegisterError";
 
 export default function FullName() {
@@ -50,8 +50,9 @@ export default function FullName() {
             }}
           />
           {registerData.fullName !== "" && (
-            <FontAwesome6
-              name="circle-xmark"
+            <AntDesign
+              name="closecircle"
+              color="gray"
               style={
                 error ? [styles.clearIcon, styles.errorText] : styles.clearIcon
               }

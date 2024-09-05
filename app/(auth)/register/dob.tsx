@@ -24,14 +24,11 @@ export default function DOB() {
       console.log("invalid");
       return;
     }
+
     setRegisterData((prev) => {
       return {
         ...prev,
-        dob: pickedDate.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-        }),
+        dob: pickedDate.toLocaleString("en-US").split(",")[0],
       };
     });
     router.push("/register/gender");

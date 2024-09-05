@@ -52,6 +52,7 @@ export default function TabLayout() {
           tabBarActiveTintColor: colorScheme == "dark" ? "white" : "black",
           tabBarInactiveTintColor: "gray",
         }}
+        backBehavior="history"
       >
         <Tabs.Screen
           name="index"
