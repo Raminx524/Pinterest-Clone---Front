@@ -7,16 +7,17 @@ import {
   StyleSheet,
   Image,
 } from "react-native";
-import auth from "@react-native-firebase/auth";
+import auth, { firebase } from "@react-native-firebase/auth";
 import { useRouter } from "expo-router";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { useRegisterData } from "@/context/registerContext";
 import { secrets } from "@/secret";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
-import { FontAwesome6 } from "@expo/vector-icons";
+import { AntDesign, FontAwesome6 } from "@expo/vector-icons";
 import RegisterError, { IValidationError } from "@/components/RegisterError";
 import axios from "axios";
+import { getCountryFromLocation } from "@/utils/getCountry";
 
 const AuthIndex = () => {
   const [email, setEmail] = useState("");
@@ -40,9 +41,9 @@ const AuthIndex = () => {
     return isValid;
   };
 
-  const checkEmailExists = async () => {
+  const checkEmailExists = async (emailToCheck: string) => {
     try {
-      await axios.get(`http://10.0.2.2:3000/api/user?email=${email}`);
+      await axios.get(`http://10.0.2.2:3000/api/user?email=${emailToCheck}`);
       return true;
     } catch (error: any) {
       if (error.status !== 404) console.log("Error checking email:", error);
@@ -58,7 +59,7 @@ const AuthIndex = () => {
       return { ...prev, email };
     });
     try {
-      const isExist = await checkEmailExists();
+      const isExist = await checkEmailExists(email);
       if (isExist) {
         router.push("/(auth)/login");
       } else {
@@ -80,12 +81,28 @@ const AuthIndex = () => {
         userInfo.idToken
       );
 
+      const country = await getCountryFromLocation();
+
       // Sign in with the credential
       const userCredential = await auth().signInWithCredential(
         googleCredential
       );
+      const isExist = await checkEmailExists(userInfo.user.email);
+      console.log({ isExist });
 
-      console.log("User signed in: ", userCredential.user);
+      if (!isExist) {
+        const newUser = {
+          firebaseUid: userCredential.user.uid,
+          email: userCredential.user.email,
+          username: userCredential.user.displayName,
+          avatar: userCredential.user.photoURL,
+          dob: "2000-01-01",
+          gender: "Other",
+          country,
+          topics: [],
+        };
+        await axios.post("http://10.0.2.2:3000/api/user", newUser);
+      }
     } catch (error) {
       console.error(error);
     }
@@ -123,8 +140,9 @@ const AuthIndex = () => {
               }}
             />
             {email !== "" && (
-              <FontAwesome6
-                name="circle-xmark"
+              <AntDesign
+                name="closecircle"
+                color="gray"
                 style={
                   error
                     ? [styles.clearIcon, styles.errorIcon]
@@ -141,15 +159,33 @@ const AuthIndex = () => {
         </View>
         <View style={{ gap: 8 }}>
           <TouchableOpacity
-            style={{ ...styles.button, backgroundColor: "#0074e8" }}
+            style={{
+              ...styles.button,
+              backgroundColor: "#0074e8",
+              flexDirection: "row",
+            }}
             onPress={facebookHandler}
           >
+            <FontAwesome6
+              name="facebook"
+              size={24}
+              color="white"
+              style={{ position: "absolute", left: 12 }}
+            />
             <Text style={styles.buttonText}>Continue with Facebook</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={{ ...styles.button, backgroundColor: "#f2f2f2" }}
+            style={{
+              ...styles.button,
+              backgroundColor: "#f2f2f2",
+              flexDirection: "row",
+            }}
             onPress={googleHandler}
           >
+            <Image
+              source={require("@/assets/images/google-icon.png")}
+              style={{ height: 24, width: 24, position: "absolute", left: 12 }}
+            />
             <Text style={{ ...styles.buttonText, color: "#202124" }}>
               Continue with Google
             </Text>

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import {
   View,
   Text,
+  Image,
   TextInput,
   TouchableOpacity,
   StyleSheet,
@@ -9,7 +10,12 @@ import {
 import { useRouter } from "expo-router";
 import auth from "@react-native-firebase/auth";
 import { styles } from "@/styles/authRegisterStyles";
-import { FontAwesome5, FontAwesome6 } from "@expo/vector-icons";
+import {
+  AntDesign,
+  FontAwesome5,
+  FontAwesome6,
+  Ionicons,
+} from "@expo/vector-icons";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import RegisterError, { IValidationError } from "@/components/RegisterError";
 import { useRegisterData } from "@/context/registerContext";
@@ -87,15 +93,35 @@ export default function Login() {
       <View style={{ width: "85%", gap: 30 }}>
         <View style={{ gap: 8, width: "100%" }}>
           <TouchableOpacity
-            style={{ ...styles.button, backgroundColor: "#0074e8" }}
+            style={{
+              ...styles.button,
+              backgroundColor: "#0074e8",
+              flexDirection: "row",
+              justifyContent: "center",
+            }}
             onPress={facebookHandler}
           >
+            <FontAwesome6
+              name="facebook"
+              size={24}
+              color="white"
+              style={{ position: "absolute", left: 12 }}
+            />
             <Text style={styles.buttonText}>Continue with Facebook</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={{ ...styles.button, backgroundColor: "#f2f2f2" }}
+            style={{
+              ...styles.button,
+              backgroundColor: "#f2f2f2",
+              flexDirection: "row",
+              justifyContent: "center",
+            }}
             onPress={googleHandler}
           >
+            <Image
+              source={require("@/assets/images/google-icon.png")}
+              style={{ height: 24, width: 24, position: "absolute", left: 12 }}
+            />
             <Text style={{ ...styles.buttonText, color: "#202124" }}>
               Continue with Google
             </Text>
@@ -118,8 +144,9 @@ export default function Login() {
               }}
             />
             {registerData.email !== "" && (
-              <FontAwesome6
-                name="circle-xmark"
+              <AntDesign
+                name="closecircle"
+                color="gray"
                 style={
                   err ? [styles.clearIcon, styles.errorIcon] : styles.clearIcon
                 }
@@ -146,15 +173,14 @@ export default function Login() {
               }}
               secureTextEntry={securePass}
             />
-            <FontAwesome5
-              name={`eye${securePass ? "" : "-slash"}`}
+            <Ionicons
+              name={securePass ? "eye" : "eye-off"}
               size={24}
-              color="#000"
               style={{
                 position: "absolute",
-                right: 12,
-                top: 10,
-                color: err ? "#d60021" : "black",
+                right: 16,
+                top: 12,
+                color: err ? "#d60021" : "gray",
               }}
               onPress={() => {
                 setSecurePass((prev) => !prev);
