@@ -98,8 +98,8 @@ export const styles = StyleSheet.create({
   },
   clearIcon: {
     position: "absolute",
-    right: 12,
-    top: 14,
+    right: 17,
+    top: 15,
     fontSize: 20,
   },
 });

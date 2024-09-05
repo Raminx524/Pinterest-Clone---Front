@@ -4,7 +4,7 @@ import { useRouter } from "expo-router";
 import { styles } from "@/styles/authRegisterStyles";
 import ProgressIndicator from "@/components/registerBullets";
 import { useRegisterData } from "@/context/registerContext";
-import { FontAwesome5 } from "@expo/vector-icons";
+import { FontAwesome5, Ionicons } from "@expo/vector-icons";
 import RegisterError, { IValidationError } from "@/components/RegisterError";
 
 export default function Password() {
@@ -19,6 +19,7 @@ export default function Password() {
       setErr({ message: "Add your password" });
       return;
     }
+    if (!isActiveBtn) return;
     try {
       router.push("/register/fullName");
     } catch (err) {
@@ -54,15 +55,14 @@ export default function Password() {
             }}
             secureTextEntry={securePass}
           />
-          <FontAwesome5
-            name={`eye${securePass ? "" : "-slash"}`}
+          <Ionicons
+            name={securePass ? "eye" : "eye-off"}
             size={24}
-            color="#000"
             style={{
               position: "absolute",
-              right: 12,
-              top: 10,
-              color: err ? "#d60021" : "black",
+              right: 16,
+              top: 12,
+              color: err ? "#d60021" : "gray",
             }}
             onPress={() => {
               setSecurePass((prev) => !prev);
