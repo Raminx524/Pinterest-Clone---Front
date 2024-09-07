@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   View,
   Text,
@@ -13,13 +13,35 @@ import { FontAwesome6 } from "@expo/vector-icons";
 import { styles } from "@/styles/authRegisterStyles";
 import { useSharedValue } from "react-native-reanimated";
 import { Switch } from "@/components/Switch";
+import { AuthContext } from "@/context/authContext";
+import api from "@/utils/api.service";
 
 export default function Board() {
+  const { user } = useContext(AuthContext);
   const router = useRouter();
   const isOn = useSharedValue(false);
   const [title, setTitle] = useState("");
+  const [collaborators, setCollaborators] = useState<string[]>([]);
   const handlePress = () => {
     isOn.value = !isOn.value;
+  };
+
+  const handleNext = async () => {
+    const newBoard = {
+      isVisible: !isOn,
+      user: user?._id,
+      collaborators,
+      title,
+    };
+    try {
+      // const res = await api.post("/board", newBoard);
+      router.replace({
+        pathname: "/(tabs)/create/searchPins",
+        // params: { board: res.data },
+      });
+    } catch (err) {
+      console.log("Error creating board: ", err);
+    }
   };
 
   return (
@@ -40,6 +62,7 @@ export default function Board() {
               ? { ...boardStyles.button, backgroundColor: "#d60021" }
               : boardStyles.button
           }
+          onPress={handleNext}
         >
           <Text style={{ fontWeight: "500", color: title ? "#fff" : "#000" }}>
             Next

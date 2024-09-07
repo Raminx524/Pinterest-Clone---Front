@@ -9,7 +9,7 @@ import { Href, useRouter } from "expo-router";
 import React from "react";
 import { View, Text, StyleSheet, Pressable, Alert } from "react-native";
 import Modal from "react-native-modal";
-import * as ImagePicker from 'expo-image-picker'; // Import ImagePicker
+import * as ImagePicker from "expo-image-picker"; // Import ImagePicker
 
 export interface IModalProps {
   visible: boolean;
@@ -48,12 +48,17 @@ const CustomCollageIcon = () => (
   </>
 );
 
-export function CreateModal({ visible, onClose, onAddPin }: IModalProps & { onAddPin: (uri: string) => void; }) {
+export function CreateModal({
+  visible,
+  onClose,
+  onAddPin,
+}: IModalProps & { onAddPin: (uri: string) => void }) {
   const router = useRouter();
 
   const navHandler = async (endPoint: string) => {
     if (endPoint === "pin") {
-      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const permissionResult =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
 
       if (permissionResult.granted) {
         const result = await ImagePicker.launchImageLibraryAsync();
