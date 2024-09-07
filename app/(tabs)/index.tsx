@@ -45,7 +45,7 @@ export default function TabOneScreen() {
 
   const callOnScrollEnd = useRef(false);
   const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+    backgroundColor: isDarkMode ? Colors.darker : "white",
     flex: 1,
   };
 

@@ -1,0 +1,16 @@
+{
+  "__v": 0,
+  "_id": "66dc8cfffd7689b3158c0fae",
+  "board": "66dc8cf9fd7689b3158c0f99",
+  "comments": [],
+  "createdAt": "2024-09-07T17:27:27.133Z",
+  "description": "Description for Pin 10",
+  "imageUrl": "https://res.cloudinary.com/dtnear5xs/image/upload/v1725714033/586555f2-bc49-4519-977b-584a133103ab.png",
+  "title": "Pin 10",
+  "topics": [
+    "66dc4fc82fc11629ecd3c3bb",
+    "66dc4fc82fc11629ecd3c3b9"
+  ],
+  "updatedAt": "2024-09-07T17:27:27.133Z",
+  "user": "66dc8cf9fd7689b3158c0f97"
+}

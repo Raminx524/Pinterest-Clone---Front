@@ -19,6 +19,7 @@ const CreateLayout = () => {
         />
         <Stack.Screen name="collage" />
         <Stack.Screen name="pin" />
+        <Stack.Screen name="searchPins" />
       </Stack>
     </>
   );
