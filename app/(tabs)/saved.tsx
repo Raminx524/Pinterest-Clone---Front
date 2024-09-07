@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import {
   SafeAreaView,
-  StyleSheet,
   TextInput,
   TouchableOpacity,
   Image,
@@ -10,11 +9,12 @@ import {
   Modal,
   Text,
   Dimensions,
+  StyleSheet,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
-import { CreateModal } from "../../components/CreateModal"; // Assuming CreateModal is in the same directory
-import { TouchableWithoutFeedback, Keyboard } from "react-native"; // Import TouchableWithoutFeedback
 import auth from "@react-native-firebase/auth"; // Import Firebase auth
+import axios from 'axios'; // Import axios for API calls
+import api from "@/utils/api.service";
 
 const { width } = Dimensions.get("window");
 
@@ -26,10 +26,23 @@ export default function SavedScreen() {
   const [isFavoriteFiltered, setIsFavoriteFiltered] = useState(false);
   const [isCreatedByYouFiltered, setIsCreatedByYouFiltered] = useState(false);
   const [viewOption, setViewOption] = useState<"Default" | "Wide" | "Compact">("Default");
-  const [isCreateModalVisible, setCreateModalVisible] = useState(false); // Create modal state
-  const [isLogoutModalVisible, setLogoutModalVisible] = useState(false); // Logout modal state
+  const [isCreateModalVisible, setCreateModalVisible] = useState(false);
+  const [isLogoutModalVisible, setLogoutModalVisible] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
   const [pins, setPins] = useState<string[]>([]); // State to store pins
+
+  useEffect(() => {
+    const fetchPins = async () => {
+      try {
+        const response = await api.get('/pin-images');
+        setPins(response.data); // Update the state with fetched pins
+      } catch (error) {
+        console.error("Error fetching pins:", error);
+      }
+    };
+
+    fetchPins(); // Fetch pins when component mounts
+  }, []);
 
   useEffect(() => {
     if (scrollViewRef.current) {
@@ -38,14 +51,10 @@ export default function SavedScreen() {
     }
   }, [selectedSection]);
 
-  const handleAddPin = (uri: string) => {
-    setPins((prevPins) => [...prevPins, uri]); // Add the new pin to the state
-  };
-
   const renderPins = () => (
     <ScrollView contentContainerStyle={styles.itemsContainer}>
-      {["https://via.placeholder.com/150", "https://via.placeholder.com/150", "https://via.placeholder.com/150", "https://via.placeholder.com/150"].map((uri, index) => (
-        <Image key={index} source={{ uri }} style={getPinStyle()} />
+      {pins.map((item, index) => (
+        <Image key={index} source={{ uri: item.url }} style={getPinStyle()} />
       ))}
     </ScrollView>
   );
@@ -206,7 +215,7 @@ export default function SavedScreen() {
         </ScrollView>
 
         {/* Create Modal */}
-        <CreateModal visible={isCreateModalVisible} onClose={() => setCreateModalVisible(false)} />
+        {/* <CreateModal visible={isCreateModalVisible} onClose={() => setCreateModalVisible(false)} /> */}
 
         {/* Sort Filter Modal */}
         <Modal
@@ -219,45 +228,22 @@ export default function SavedScreen() {
             <View style={styles.modalContent}>
               <Text style={styles.modalHeader}>Sort by</Text>
               <TouchableOpacity style={styles.modalOption} onPress={() => setFilterVisible(false)}>
-                <Text style={styles.modalOptionText}>A to Z</Text>
+                <Text style={styles.modalOptionText}>Date</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.modalOption} onPress={() => setFilterVisible(false)}>
-                <Text style={styles.modalOptionText}>Z to A</Text>
+                <Text style={styles.modalOptionText}>Alphabetical</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.modalCloseButton} onPress={() => setFilterVisible(false)}>
-                <Text style={styles.modalCloseButtonText}>Close</Text>
+              <TouchableOpacity style={styles.modalOption} onPress={() => setFilterVisible(false)}>
+                <Text style={styles.modalOptionText}>Category</Text>
               </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
-
-        {/* View Options Modal */}
-        <Modal
-          transparent={true}
-          visible={viewOptionsVisible}
-          animationType="slide"
-          onRequestClose={() => setViewOptionsVisible(false)}
-        >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalHeader}>View Options</Text>
-              <TouchableOpacity style={styles.modalOption} onPress={() => { setViewOption("Default"); setViewOptionsVisible(false); }}>
-                <Text style={styles.modalOptionText}>Default</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.modalOption} onPress={() => { setViewOption("Wide"); setViewOptionsVisible(false); }}>
-                <Text style={styles.modalOptionText}>Wide</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.modalOption} onPress={() => { setViewOption("Compact"); setViewOptionsVisible(false); }}>
-                <Text style={styles.modalOptionText}>Compact</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.modalCloseButton} onPress={() => setViewOptionsVisible(false)}>
-                <Text style={styles.modalCloseButtonText}>Close</Text>
+              <TouchableOpacity style={styles.closeButton} onPress={() => setFilterVisible(false)}>
+                <Text style={styles.closeButtonText}>Close</Text>
               </TouchableOpacity>
             </View>
           </View>
         </Modal>
 
-        {/* Logout Confirmation Modal */}
+        {/* Logout Modal */}
         <Modal
           transparent={true}
           visible={isLogoutModalVisible}
@@ -267,15 +253,12 @@ export default function SavedScreen() {
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <Text style={styles.modalHeader}>Are you sure you want to log out?</Text>
-              <View style={styles.modalButtonContainer}>
-
-                <TouchableOpacity style={styles.modalButton} onPress={() => setLogoutModalVisible(false)}>
-                  <Text style={styles.modalButtonText}>No</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.modalButton} onPress={handleLogout}>
-                  <Text style={styles.modalButtonText}>Yes</Text>
-                </TouchableOpacity>
-              </View>
+              <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+                <Text style={styles.logoutButtonText}>Logout</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.closeButton} onPress={() => setLogoutModalVisible(false)}>
+                <Text style={styles.closeButtonText}>Cancel</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </Modal>
@@ -283,9 +266,6 @@ export default function SavedScreen() {
     </SafeAreaView>
   );
 }
-
-
-
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
