@@ -5,11 +5,14 @@ import {
   TouchableOpacity,
   FlatList,
   Image,
+  Linking,
+  Dimensions,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FontAwesome6 } from "@expo/vector-icons";
 import api from "@/utils/api.service";
+import { PinCard } from "@/components/PinCard";
 
 const searchPins = () => {
   const [pins, setPins] = useState([]);
@@ -46,15 +49,22 @@ const searchPins = () => {
         </TouchableOpacity>
       </View>
       <FlatList
+        contentContainerStyle={{
+          width: Dimensions.get("screen").width,
+        }}
+        numColumns={2}
         keyExtractor={(item: any) => item._id}
         data={pins}
-        renderItem={({ item }: any) => {
-          console.log(item);
-
+        renderItem={({ item, i }: any) => {
           return (
-            <View>
-              <Image source={item.imageUrl} />
-            </View>
+            <PinCard
+              item={item}
+              items={pins}
+              style={{
+                marginLeft: i % 2 === 0 ? 0 : 15,
+                width: Dimensions.get("screen").width / 2 - 25,
+              }}
+            />
           );
         }}
       />
@@ -66,7 +76,6 @@ const searchPinsStyles = StyleSheet.create({
     paddingHorizontal: 12,
     position: "relative",
     margin: 0,
-    flex: 1,
     alignItems: "center",
     backgroundColor: "#fff",
   },
