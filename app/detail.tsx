@@ -45,10 +45,13 @@ export default function Detail() {
   const [isHasImage, setHasImage] = useState(true);
 
   const isTop = useSharedValue(false);
-  const [currentPinId, setCurrentPinId] = useState(searchParams.currentId);
+  const [currentPinId, setCurrentPinId] = useState(
+    searchParams.currentId as string
+  );
   // const [currentPin, setCurrentPin] = useState(null);
   // const [previousPin, setPreviousPin] = useState(null);
   // const [nextPin, setNextPin] = useState(null);
+
   const {
     getCurrentPin,
     getPrevPin,
@@ -64,30 +67,30 @@ export default function Detail() {
 
   const [slides, setSlides] = useState([
     {
-      id: 0,
+      _id: "0",
       key: "left",
       position: useSharedValue(-screenWidth),
       content:
         "lorem ipsum dolor sit amet, consectetur adipiscing elit sed, sed nulla",
-      image: "",
+      imageUrl: "",
       visible: useSharedValue(true),
     },
     {
-      id: 0,
+      _id: "0",
       key: "current",
       position: useSharedValue(0),
       content:
         "lorem ipsum dolor sit amet, consectetur adipiscing elit sed, sed nulla",
-      image: "",
+      imageUrl: "",
       visible: useSharedValue(true),
     },
     {
-      id: 0,
+      _id: "0",
       key: "right",
       position: useSharedValue(screenWidth),
       content:
         "lorem ipsum dolor sit amet, consectetur adipiscing elit sed, sed nulla",
-      image: "",
+      imageUrl: "",
       visible: useSharedValue(true),
     },
   ]);
@@ -100,10 +103,12 @@ export default function Detail() {
         const left = prevSlides[0];
         const current = prevSlides[1];
         const right = prevSlides[2];
+        console.log({ currentPinId });
 
         const currentPin = getCurrentPin(currentPinId);
         const prevPin = getPrevPin(currentPinId);
         const nextPin = getNextPin(currentPinId);
+        console.log({ currentPin });
 
         return [
           { ...left, ...prevPin },
@@ -114,12 +119,12 @@ export default function Detail() {
     }
     async function getSize() {
       try {
-        const res = await Linking.canOpenURL(slides[1].image);
+        const res = await Linking.canOpenURL(slides[1].imageUrl);
 
         if (!res) {
           setHasImage(false);
         } else {
-          Image.getSize(slides[1].image, (width, height) => {
+          Image.getSize(slides[1].imageUrl, (width, height) => {
             const screenWidth = Dimensions.get("window").width;
             const newWidth = screenWidth - 50;
             const newHeight = (newWidth / width) * height;
@@ -216,7 +221,7 @@ export default function Detail() {
           left.position.value = withSpring(0);
           current.position.value = withSpring(screenWidth);
 
-          setCurrentPinId(left.id);
+          setCurrentPinId(left._id);
 
           return [
             { ...right, position: right.position },
@@ -237,7 +242,7 @@ export default function Detail() {
           right.position.value = withSpring(0);
           left.position.value = screenWidth;
 
-          setCurrentPinId(right.id);
+          setCurrentPinId(right._id);
 
           return [
             { ...current, position: current.position },
@@ -324,9 +329,9 @@ export default function Detail() {
             // }}
             > */}
               <Image
-                source={{ uri: slide.image }}
+                source={{ uri: slide.imageUrl }}
                 style={{
-                  height: heightImage,
+                  height: heightImage ? heightImage : 300,
                   alignSelf: "stretch",
                   borderRadius: 20,
                 }}
@@ -364,6 +369,7 @@ export default function Detail() {
                 <Text style={{ fontSize: 22, fontWeight: "700" }}>
                   {/* {slide.title} */}
                   Lorem ipsum dolor, sit amet consectetur adipisicing elit.
+                  {slide._id}
                 </Text>
                 <Text style={{ fontSize: 16, fontWeight: "300" }}>
                   {/* {slide.description} */}
