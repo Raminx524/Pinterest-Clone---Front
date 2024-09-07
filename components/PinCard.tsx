@@ -16,6 +16,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router, useNavigation } from "expo-router";
 import { Pin } from "@/app/(tabs)";
 import { ShareMenu } from "./ShareMenu";
+import { usePinContext } from "@/context/pinContext";
 
 export const PinCard: FC<{
   item: Pin;
@@ -28,7 +29,8 @@ export const PinCard: FC<{
   const [isHasImage, setHasImage] = useState(true);
   // let itemIndex = 0;
   const [itemIndex, setItemIndex] = useState(0);
-  const navigation = useNavigation();
+  // const navigation = useNavigation();
+  const { pins, setPins, reloadPins } = usePinContext();
 
   useEffect(() => {
     async function getSize() {
@@ -59,8 +61,10 @@ export const PinCard: FC<{
       if (!items) return null;
       setItemIndex(items.findIndex((pin) => pin._id === item._id));
     }
+
     getItemIndex();
 
+    // console.log({ itemIndex });
     getSize();
   }, []);
   // console.log(itemIndex);
@@ -69,9 +73,14 @@ export const PinCard: FC<{
     return (
       <TouchableOpacity
         onPress={() => {
+          reloadPins(item._id);
           router.push({
             pathname: "/detail-slide",
-            params: { currentId: item._id, itemIndex },
+            params: {
+              currentId: item._id,
+              itemIndex,
+              pins: JSON.stringify(pins),
+            },
           });
         }}
       >

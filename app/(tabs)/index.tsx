@@ -37,6 +37,7 @@ export interface Pin {
   title: string;
   description: string;
   user: IUser;
+  topics: string[];
 }
 
 export default function TabOneScreen() {

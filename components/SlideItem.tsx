@@ -15,6 +15,7 @@ import { usePinContext } from "@/context/pinContext";
 import MasonryList from "@react-native-seoul/masonry-list";
 import { PinCard } from "./PinCard";
 import { ScrollView } from "react-native-gesture-handler";
+import api from "@/utils/api.service";
 
 const { height, width } = Dimensions.get("screen");
 
@@ -45,9 +46,23 @@ export const SlideItem = ({
     getHeight();
   }, []);
 
+  // console.log({ relatedPins });
+
   useEffect(() => {
-    function getPins() {
-      if (item._id === currentId) setRelatedPins(pins || null);
+    async function getPins() {
+      if (item._id === currentId) {
+        // console.log({ item });
+        let link = "/pin?limit=10&page=1";
+        if (item.topics) {
+          link += "&topic=";
+          link += item.topics.join("&topic=");
+        }
+        const { data } = await api.get(link);
+
+        console.log({ data });
+
+        setRelatedPins(data);
+      }
     }
     getPins();
   }, [currentId]);
