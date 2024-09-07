@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import {
   SafeAreaView,
   TextInput,
@@ -13,28 +13,37 @@ import {
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import auth from "@react-native-firebase/auth"; // Import Firebase auth
-import axios from 'axios'; // Import axios for API calls
+import axios from "axios"; // Import axios for API calls
 import api from "@/utils/api.service";
+import { AuthContext } from "@/context/authContext";
 
 const { width } = Dimensions.get("window");
 
 export default function SavedScreen() {
-  const [selectedSection, setSelectedSection] = useState<"Pins" | "Boards">("Pins");
+  const [selectedSection, setSelectedSection] = useState<"Pins" | "Boards">(
+    "Pins"
+  );
   const [filterVisible, setFilterVisible] = useState(false);
   const [viewOptionsVisible, setViewOptionsVisible] = useState(false);
   const [isGroupFiltered, setIsGroupFiltered] = useState(false);
   const [isFavoriteFiltered, setIsFavoriteFiltered] = useState(false);
   const [isCreatedByYouFiltered, setIsCreatedByYouFiltered] = useState(false);
-  const [viewOption, setViewOption] = useState<"Default" | "Wide" | "Compact">("Default");
+  const [viewOption, setViewOption] = useState<"Default" | "Wide" | "Compact">(
+    "Default"
+  );
   const [isCreateModalVisible, setCreateModalVisible] = useState(false);
   const [isLogoutModalVisible, setLogoutModalVisible] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
-  const [pins, setPins] = useState<string[]>([]); // State to store pins
+  const [pins, setPins] = useState([]); // State to store pins
+  const { user } = useContext(AuthContext);
+  console.log(user);
 
   useEffect(() => {
     const fetchPins = async () => {
       try {
-        const response = await api.get('/pin-images');
+        const response = await api.get(`/pin?user=${user?._id}`);
+        console.log(response.data);
+
         setPins(response.data); // Update the state with fetched pins
       } catch (error) {
         console.error("Error fetching pins:", error);
@@ -47,21 +56,33 @@ export default function SavedScreen() {
   useEffect(() => {
     if (scrollViewRef.current) {
       const pageIndex = selectedSection === "Pins" ? 0 : 1;
-      scrollViewRef.current.scrollTo({ x: pageIndex * width, y: 0, animated: true });
+      scrollViewRef.current.scrollTo({
+        x: pageIndex * width,
+        y: 0,
+        animated: true,
+      });
     }
   }, [selectedSection]);
 
   const renderPins = () => (
     <ScrollView contentContainerStyle={styles.itemsContainer}>
       {pins.map((item, index) => (
-        <Image key={index} source={{ uri: item.url }} style={getPinStyle()} />
+        <Image
+          key={index}
+          source={{ uri: item.imageUrl }}
+          style={getPinStyle()}
+        />
       ))}
     </ScrollView>
   );
 
   const renderBoards = () => (
     <ScrollView contentContainerStyle={styles.itemsContainer}>
-      {["https://via.placeholder.com/100", "https://via.placeholder.com/100", "https://via.placeholder.com/100"].map((uri, index) => (
+      {[
+        "https://via.placeholder.com/100",
+        "https://via.placeholder.com/100",
+        "https://via.placeholder.com/100",
+      ].map((uri, index) => (
         <Image key={index} source={{ uri }} style={styles.savedBoard} />
       ))}
     </ScrollView>
@@ -120,21 +141,32 @@ export default function SavedScreen() {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.profileImageContainer} onPress={() => setLogoutModalVisible(true)}>
+          <TouchableOpacity
+            style={styles.profileImageContainer}
+            onPress={() => setLogoutModalVisible(true)}
+          >
             <Image
-              source={{ uri: 'https://static.vecteezy.com/system/resources/thumbnails/007/140/806/small_2x/profile-glyph-circle-background-icon-vector.jpg' }}
+              source={{
+                uri: "https://static.vecteezy.com/system/resources/thumbnails/007/140/806/small_2x/profile-glyph-circle-background-icon-vector.jpg",
+              }}
               style={styles.profileImage}
             />
           </TouchableOpacity>
           <View style={styles.buttonsWrapper}>
             <TouchableOpacity
-              style={[styles.button, selectedSection === "Pins" && styles.selectedButton]}
+              style={[
+                styles.button,
+                selectedSection === "Pins" && styles.selectedButton,
+              ]}
               onPress={() => handleSectionChange("Pins")}
             >
               <Text style={styles.buttonText}>Pins</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.button, selectedSection === "Boards" && styles.selectedButton]}
+              style={[
+                styles.button,
+                selectedSection === "Boards" && styles.selectedButton,
+              ]}
               onPress={() => handleSectionChange("Boards")}
             >
               <Text style={styles.buttonText}>Boards</Text>
@@ -143,7 +175,12 @@ export default function SavedScreen() {
         </View>
         <View style={styles.searchContainer}>
           <View style={styles.searchBar}>
-            <FontAwesome name="search" size={16} color="#B8B8B8" style={styles.searchIcon} />
+            <FontAwesome
+              name="search"
+              size={16}
+              color="#B8B8B8"
+              style={styles.searchIcon}
+            />
             <TextInput
               style={styles.input}
               placeholder="Search your saved ideas"
@@ -164,30 +201,75 @@ export default function SavedScreen() {
           pagingEnabled
           showsHorizontalScrollIndicator={false}
           onMomentumScrollEnd={(event) => {
-            const pageIndex = Math.round(event.nativeEvent.contentOffset.x / width);
+            const pageIndex = Math.round(
+              event.nativeEvent.contentOffset.x / width
+            );
             setSelectedSection(pageIndex === 0 ? "Pins" : "Boards");
           }}
         >
           <View style={[styles.page, { width }]}>
             <View style={styles.filtersContainer}>
-              <TouchableOpacity style={styles.filterButton} onPress={() => setViewOptionsVisible(true)}>
+              <TouchableOpacity
+                style={styles.filterButton}
+                onPress={() => setViewOptionsVisible(true)}
+              >
                 <FontAwesome name={getCurrentIcon()} size={16} color="#000" />
-                <FontAwesome name="angle-down" size={16} color="#000" style={styles.filterIcon} />
+                <FontAwesome
+                  name="angle-down"
+                  size={16}
+                  color="#000"
+                  style={styles.filterIcon}
+                />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.filterButton} onPress={toggleFavoriteFilter}>
-                <FontAwesome name="star" size={16} color={isFavoriteFiltered ? "#000" : "#000"} style={{ marginRight: 5 }} />
-                <Text style={[styles.filterText, isFavoriteFiltered && styles.activeFilterText]}>Favorites</Text>
+              <TouchableOpacity
+                style={styles.filterButton}
+                onPress={toggleFavoriteFilter}
+              >
+                <FontAwesome
+                  name="star"
+                  size={16}
+                  color={isFavoriteFiltered ? "#000" : "#000"}
+                  style={{ marginRight: 5 }}
+                />
+                <Text
+                  style={[
+                    styles.filterText,
+                    isFavoriteFiltered && styles.activeFilterText,
+                  ]}
+                >
+                  Favorites
+                </Text>
                 {isFavoriteFiltered && (
                   <TouchableOpacity onPress={toggleFavoriteFilter}>
-                    <FontAwesome name="times" size={16} color="#000" style={{ marginLeft: 5 }} />
+                    <FontAwesome
+                      name="times"
+                      size={16}
+                      color="#000"
+                      style={{ marginLeft: 5 }}
+                    />
                   </TouchableOpacity>
                 )}
               </TouchableOpacity>
-              <TouchableOpacity style={styles.filterButton} onPress={toggleCreatedByYouFilter}>
-                <Text style={[styles.filterText, isCreatedByYouFiltered && styles.activeFilterText]}>Created by You</Text>
+              <TouchableOpacity
+                style={styles.filterButton}
+                onPress={toggleCreatedByYouFilter}
+              >
+                <Text
+                  style={[
+                    styles.filterText,
+                    isCreatedByYouFiltered && styles.activeFilterText,
+                  ]}
+                >
+                  Created by You
+                </Text>
                 {isCreatedByYouFiltered && (
                   <TouchableOpacity onPress={toggleCreatedByYouFilter}>
-                    <FontAwesome name="times" size={16} color="#000" style={{ marginLeft: 5 }} />
+                    <FontAwesome
+                      name="times"
+                      size={16}
+                      color="#000"
+                      style={{ marginLeft: 5 }}
+                    />
                   </TouchableOpacity>
                 )}
               </TouchableOpacity>
@@ -197,15 +279,38 @@ export default function SavedScreen() {
 
           <View style={[styles.page, { width }]}>
             <View style={styles.filtersContainer}>
-              <TouchableOpacity style={styles.filterButton} onPress={() => setFilterVisible(true)}>
+              <TouchableOpacity
+                style={styles.filterButton}
+                onPress={() => setFilterVisible(true)}
+              >
                 <FontAwesome name="sort" size={16} color="#000" />
-                <FontAwesome name="angle-down" size={16} color="#000" style={styles.filterIcon} />
+                <FontAwesome
+                  name="angle-down"
+                  size={16}
+                  color="#000"
+                  style={styles.filterIcon}
+                />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.filterButton} onPress={toggleGroupFilter}>
-                <Text style={[styles.filterText, isGroupFiltered && styles.activeFilterText]}>Group</Text>
+              <TouchableOpacity
+                style={styles.filterButton}
+                onPress={toggleGroupFilter}
+              >
+                <Text
+                  style={[
+                    styles.filterText,
+                    isGroupFiltered && styles.activeFilterText,
+                  ]}
+                >
+                  Group
+                </Text>
                 {isGroupFiltered && (
                   <TouchableOpacity onPress={toggleGroupFilter}>
-                    <FontAwesome name="times" size={16} color="#000" style={{ marginLeft: 5 }} />
+                    <FontAwesome
+                      name="times"
+                      size={16}
+                      color="#000"
+                      style={{ marginLeft: 5 }}
+                    />
                   </TouchableOpacity>
                 )}
               </TouchableOpacity>
@@ -227,16 +332,28 @@ export default function SavedScreen() {
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <Text style={styles.modalHeader}>Sort by</Text>
-              <TouchableOpacity style={styles.modalOption} onPress={() => setFilterVisible(false)}>
+              <TouchableOpacity
+                style={styles.modalOption}
+                onPress={() => setFilterVisible(false)}
+              >
                 <Text style={styles.modalOptionText}>Date</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.modalOption} onPress={() => setFilterVisible(false)}>
+              <TouchableOpacity
+                style={styles.modalOption}
+                onPress={() => setFilterVisible(false)}
+              >
                 <Text style={styles.modalOptionText}>Alphabetical</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.modalOption} onPress={() => setFilterVisible(false)}>
+              <TouchableOpacity
+                style={styles.modalOption}
+                onPress={() => setFilterVisible(false)}
+              >
                 <Text style={styles.modalOptionText}>Category</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.closeButton} onPress={() => setFilterVisible(false)}>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setFilterVisible(false)}
+              >
                 <Text style={styles.closeButtonText}>Close</Text>
               </TouchableOpacity>
             </View>
@@ -252,11 +369,19 @@ export default function SavedScreen() {
         >
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              <Text style={styles.modalHeader}>Are you sure you want to log out?</Text>
-              <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+              <Text style={styles.modalHeader}>
+                Are you sure you want to log out?
+              </Text>
+              <TouchableOpacity
+                style={styles.logoutButton}
+                onPress={handleLogout}
+              >
                 <Text style={styles.logoutButtonText}>Logout</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.closeButton} onPress={() => setLogoutModalVisible(false)}>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setLogoutModalVisible(false)}
+              >
                 <Text style={styles.closeButtonText}>Cancel</Text>
               </TouchableOpacity>
             </View>
@@ -461,8 +586,7 @@ const styles = StyleSheet.create({
     color: "#000000",
   },
 
-  modalButtons: {
-  },
+  modalButtons: {},
   modalButton: {
     margin: 15,
     backgroundColor: "#DCDCDC",
@@ -473,13 +597,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     width: "38%",
     alignSelf: "center",
-
   },
-  modalButtonText: {
-
-  },
-  modalButtonContainer: {
-
-  }
-
+  modalButtonText: {},
+  modalButtonContainer: {},
 });
