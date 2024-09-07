@@ -1,3 +1,4 @@
+import axios from "axios";
 import {
   AntDesign,
   FontAwesome5,
@@ -6,10 +7,13 @@ import {
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
 import { Href, useRouter } from "expo-router";
-import React from "react";
-import { View, Text, StyleSheet, Pressable, Alert } from "react-native";
+import React, { useContext, useState } from "react";
+import { View, Text, StyleSheet, Pressable, Alert, ActivityIndicator, TextInput } from "react-native";
 import Modal from "react-native-modal";
-import * as ImagePicker from "expo-image-picker"; // Import ImagePicker
+import * as ImagePicker from 'expo-image-picker';
+import api from "@/utils/api.service";
+import { AuthContext } from "@/context/authContext";
+
 
 export interface IModalProps {
   visible: boolean;
@@ -48,12 +52,68 @@ const CustomCollageIcon = () => (
   </>
 );
 
-export function CreateModal({
-  visible,
-  onClose,
-  onAddPin,
-}: IModalProps & { onAddPin: (uri: string) => void }) {
+export function CreateModal({ visible, onClose }: IModalProps) {
+  const [uploading, setUploading] = useState(false);
+  const [showFormModal, setShowFormModal] = useState(false);
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [link, setLink] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+
   const router = useRouter();
+  const { user } = useContext(AuthContext);
+
+
+  const uploadToCloudinary = async (imageUri: string) => {
+    const data = new FormData();
+
+    const image: any = {
+      uri: imageUri,
+      type: 'image/jpeg',
+      name: "upload.jpg",
+    };
+
+    data.append("file", image);
+    data.append("upload_preset", "ml_default");
+
+    try {
+      setUploading(true);
+
+      const res = await axios.post(
+        "https://api.cloudinary.com/v1_1/dtnear5xs/image/upload",
+        data,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      setUploading(false);
+      return res.data.secure_url;
+    } catch (error) {
+      setUploading(false);
+      console.error("Error uploading image", error);
+      Alert.alert("Upload failed", "Failed to upload image to Cloudinary. Please try again.");
+      return null;
+    }
+  };
+
+  const savePinImage = async (imageUrl: string, title: string, description: string, link: string) => {
+    console.log(imageUrl);
+    console.log(title);
+    console.log(description);
+    console.log(link);
+
+    try {
+      const response = await api.post('/pin', { imageUrl, title, description, user: user?._id, linkUrl: link }); 1
+
+      console.log("Image saved successfully:", response.data);
+    } catch (error) {
+      console.error("Error saving image to MongoDB:", error);
+      Alert.alert("Save failed", "Failed to save image details. Please try again.");
+    }
+  };
 
   const navHandler = async (endPoint: string) => {
     if (endPoint === "pin") {
@@ -61,12 +121,27 @@ export function CreateModal({
         await ImagePicker.requestMediaLibraryPermissionsAsync();
 
       if (permissionResult.granted) {
-        const result = await ImagePicker.launchImageLibraryAsync();
+        const result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          aspect: [4, 3],
+          quality: 1,
+        });
+
         if (!result.canceled && result.assets && result.assets.length > 0) {
-          onAddPin(result.assets[0].uri); // Pass the image URI to the parent
+          const imageUri = result.assets[0].uri;
+          console.log("Selected image URI:", imageUri);
+
+          const cloudinaryUrl = await uploadToCloudinary(imageUri);
+
+          if (cloudinaryUrl) {
+            console.log("Cloudinary URL:", cloudinaryUrl);
+            setImageUrl(cloudinaryUrl);
+            setShowFormModal(true);
+          }
         }
       } else {
-        Alert.alert("Permission to access camera roll is required!");
+        Alert.alert("Permission required", "Permission to access camera roll is required!");
       }
     } else {
       router.push(`/(tabs)/create/${endPoint}` as Href<string>);
@@ -75,46 +150,101 @@ export function CreateModal({
     onClose();
   };
 
+  const handleSubmit = async () => {
+    if (title && description && imageUrl) {
+      await savePinImage(imageUrl, title, description, link);
+      setShowFormModal(false);
+      setTitle('');
+      setDescription('');
+      setLink('');
+      setImageUrl('');
+    } else {
+      Alert.alert("Missing information", "Please fill in at least the title and description.");
+    }
+  };
+
   return (
-    <Modal
-      isVisible={visible}
-      presentationStyle="overFullScreen"
-      style={styles.modalContainer}
-      onBackdropPress={() => onClose()}
-    >
-      <View style={styles.modalContent}>
-        <Pressable onPress={onClose}>
-          <FontAwesome6 name="x" size={18} style={styles.closeButton} />
-        </Pressable>
-        <Text style={styles.modalTitle}>Start creating now</Text>
-        <View style={styles.routesContainer}>
-          <Pressable style={styles.modalLink} onPress={() => navHandler("pin")}>
-            <View style={styles.iconWrapper}>
-              <FontAwesome5 name="thumbtack" size={20} color="black" />
-            </View>
-            <Text style={styles.modalLinkText}>Pin</Text>
+    <>
+      <Modal
+        isVisible={visible}
+        presentationStyle="overFullScreen"
+        style={styles.modalContainer}
+        onBackdropPress={() => onClose()}
+      >
+        <View style={styles.modalContent}>
+          <Pressable onPress={onClose}>
+            <FontAwesome6 name="x" size={18} style={styles.closeButton} />
           </Pressable>
-          <Pressable
-            style={styles.modalLink}
-            onPress={() => navHandler("collage")}
-          >
-            <View style={styles.iconWrapper}>
-              <CustomCollageIcon />
+          <Text style={styles.modalTitle}>Start creating now</Text>
+          {uploading ? (
+            <ActivityIndicator size="large" color="#0000ff" />
+          ) : (
+            <View style={styles.routesContainer}>
+              <Pressable style={styles.modalLink} onPress={() => navHandler("pin")}>
+                <View style={styles.iconWrapper}>
+                  <FontAwesome5 name="thumbtack" size={20} color="black" />
+                </View>
+                <Text style={styles.modalLinkText}>Pin</Text>
+              </Pressable>
+              <Pressable
+                style={styles.modalLink}
+                onPress={() => navHandler("collage")}
+              >
+                <View style={styles.iconWrapper}>
+                  <CustomCollageIcon />
+                </View>
+                <Text style={styles.modalLinkText}>Collage</Text>
+              </Pressable>
+              <Pressable
+                style={styles.modalLink}
+                onPress={() => navHandler("board")}
+              >
+                <View style={styles.iconWrapper}>
+                  <MaterialCommunityIcons name="collage" size={28} color="black" />
+                </View>
+                <Text style={styles.modalLinkText}>Board</Text>
+              </Pressable>
             </View>
-            <Text style={styles.modalLinkText}>Collage</Text>
+          )}
+        </View>
+      </Modal>
+
+      <Modal
+        isVisible={showFormModal}
+        presentationStyle="overFullScreen"
+        style={styles.modalContainer}
+        onBackdropPress={() => setShowFormModal(false)}
+      >
+        <View style={styles.formModalContent}>
+          <Pressable onPress={() => setShowFormModal(false)}>
+            <FontAwesome6 name="x" size={18} style={styles.closeButton} />
           </Pressable>
-          <Pressable
-            style={styles.modalLink}
-            onPress={() => navHandler("board")}
-          >
-            <View style={styles.iconWrapper}>
-              <MaterialCommunityIcons name="collage" size={28} color="black" />
-            </View>
-            <Text style={styles.modalLinkText}>Board</Text>
+          <Text style={styles.modalTitle}>Add Pin Details</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Title"
+            value={title}
+            onChangeText={setTitle}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Description"
+            value={description}
+            onChangeText={setDescription}
+            multiline
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Link (optional)"
+            value={link}
+            onChangeText={setLink}
+          />
+          <Pressable style={styles.submitButton} onPress={handleSubmit}>
+            <Text style={styles.submitButtonText}>Save Pin</Text>
           </Pressable>
         </View>
-      </View>
-    </Modal>
+      </Modal>
+    </>
   );
 }
 
@@ -138,11 +268,13 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "500",
     alignSelf: "center",
+    marginBottom: 20,
   },
   closeButton: {
     position: "absolute",
     left: 10,
-    top: 5,
+    top: 10,
+    zIndex: 1,
   },
   routesContainer: {
     flexDirection: "row",
@@ -166,5 +298,32 @@ const styles = StyleSheet.create({
   modalLinkText: {
     fontSize: 13,
     fontWeight: "600",
+  },
+  formModalContent: {
+    width: "100%",
+    padding: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    maxHeight: "80%",
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    padding: 12,
+    marginBottom: 15,
+    borderRadius: 8,
+    fontSize: 16,
+  },
+  submitButton: {
+    backgroundColor: '#E60023',
+    padding: 15,
+    borderRadius: 25,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  submitButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });

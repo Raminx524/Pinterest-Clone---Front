@@ -299,11 +299,11 @@ export default function Detail() {
                 ],
               })),
               (slide.key == slides[0].key || slide.key == slides[2].key) &&
-              isPrevNextVisible
+                isPrevNextVisible
                 ? { opacity: 1 }
                 : slide.key == slides[1].key
-                ? { opacity: 1 }
-                : { opacity: 0 },
+                  ? { opacity: 1 }
+                  : { opacity: 0 },
               slide.key == slides[1].key ? { zIndex: 1 } : { zIndex: 0 },
               { height: "100%" },
             ]}
@@ -361,7 +361,7 @@ export default function Detail() {
                 <View style={{ flex: 1, flexBasis: "20%" }}>
                   <Button
                     title="Follow"
-                    // isActive={true}
+                  // isActive={true}
                   />
                 </View>
               </View>
