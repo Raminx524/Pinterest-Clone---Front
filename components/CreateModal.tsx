@@ -14,6 +14,7 @@ import * as ImagePicker from 'expo-image-picker';
 import api from "@/utils/api.service";
 import { AuthContext } from "@/context/authContext";
 
+
 export interface IModalProps {
   visible: boolean;
   onClose: () => void;
@@ -58,6 +59,7 @@ export function CreateModal({ visible, onClose }: IModalProps) {
   const [description, setDescription] = useState('');
   const [link, setLink] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+
   const router = useRouter();
   const { user } = useContext(AuthContext);
 
@@ -115,7 +117,8 @@ export function CreateModal({ visible, onClose }: IModalProps) {
 
   const navHandler = async (endPoint: string) => {
     if (endPoint === "pin") {
-      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const permissionResult =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
 
       if (permissionResult.granted) {
         const result = await ImagePicker.launchImageLibraryAsync({

@@ -6,7 +6,7 @@ import auth from "@react-native-firebase/auth";
 //   process.env.NODE_ENV === "production" ? "/api" : "//localhost:3000/api";
 const apiUrl =
   Platform.OS === "android"
-    ? "http://10.0.2.2:3000/api/"
+    ? "http://10.0.2.2:3000/api"
     : "http://localhost:3000/api";
 if (!apiUrl) {
   throw new Error("API_URL is not defined");
