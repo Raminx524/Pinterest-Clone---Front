@@ -9,11 +9,14 @@ import {
   View,
   Modal,
   Text,
-  Dimensions
+  Dimensions,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
+import { CreateModal } from "../../components/CreateModal"; // Assuming CreateModal is in the same directory
+import { TouchableWithoutFeedback, Keyboard } from "react-native"; // Import TouchableWithoutFeedback
+import auth from "@react-native-firebase/auth"; // Import Firebase auth
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
 export default function SavedScreen() {
   const [selectedSection, setSelectedSection] = useState<"Pins" | "Boards">("Pins");
@@ -23,8 +26,10 @@ export default function SavedScreen() {
   const [isFavoriteFiltered, setIsFavoriteFiltered] = useState(false);
   const [isCreatedByYouFiltered, setIsCreatedByYouFiltered] = useState(false);
   const [viewOption, setViewOption] = useState<"Default" | "Wide" | "Compact">("Default");
-
+  const [isCreateModalVisible, setCreateModalVisible] = useState(false); // Create modal state
+  const [isLogoutModalVisible, setLogoutModalVisible] = useState(false); // Logout modal state
   const scrollViewRef = useRef<ScrollView>(null);
+  const [pins, setPins] = useState<string[]>([]); // State to store pins
 
   useEffect(() => {
     if (scrollViewRef.current) {
@@ -32,6 +37,10 @@ export default function SavedScreen() {
       scrollViewRef.current.scrollTo({ x: pageIndex * width, y: 0, animated: true });
     }
   }, [selectedSection]);
+
+  const handleAddPin = (uri: string) => {
+    setPins((prevPins) => [...prevPins, uri]); // Add the new pin to the state
+  };
 
   const renderPins = () => (
     <ScrollView contentContainerStyle={styles.itemsContainer}>
@@ -89,13 +98,22 @@ export default function SavedScreen() {
     setSelectedSection(section);
   };
 
+  const handleLogout = async () => {
+    try {
+      await auth().signOut(); // Log out the user
+      // Optionally, navigate to the login screen or perform any other actions after logging out
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.profileImageContainer}>
+          <TouchableOpacity style={styles.profileImageContainer} onPress={() => setLogoutModalVisible(true)}>
             <Image
-              source={{ uri: 'https://via.placeholder.com/40' }}
+              source={{ uri: 'https://static.vecteezy.com/system/resources/thumbnails/007/140/806/small_2x/profile-glyph-circle-background-icon-vector.jpg' }}
               style={styles.profileImage}
             />
           </TouchableOpacity>
@@ -123,7 +141,10 @@ export default function SavedScreen() {
               placeholderTextColor="#B8B8B8"
             />
           </View>
-          <TouchableOpacity style={styles.plusButton}>
+          <TouchableOpacity
+            style={styles.plusButton}
+            onPress={() => setCreateModalVisible(true)} // Open CreateModal on press
+          >
             <FontAwesome name="plus" size={20} color="#000" />
           </TouchableOpacity>
         </View>
@@ -149,7 +170,7 @@ export default function SavedScreen() {
                 <Text style={[styles.filterText, isFavoriteFiltered && styles.activeFilterText]}>Favorites</Text>
                 {isFavoriteFiltered && (
                   <TouchableOpacity onPress={toggleFavoriteFilter}>
-                    <FontAwesome name="times" size={16} color="#FF0000" style={{ marginLeft: 5 }} />
+                    <FontAwesome name="times" size={16} color="#000" style={{ marginLeft: 5 }} />
                   </TouchableOpacity>
                 )}
               </TouchableOpacity>
@@ -157,7 +178,7 @@ export default function SavedScreen() {
                 <Text style={[styles.filterText, isCreatedByYouFiltered && styles.activeFilterText]}>Created by You</Text>
                 {isCreatedByYouFiltered && (
                   <TouchableOpacity onPress={toggleCreatedByYouFilter}>
-                    <FontAwesome name="times" size={16} color="#FF0000" style={{ marginLeft: 5 }} />
+                    <FontAwesome name="times" size={16} color="#000" style={{ marginLeft: 5 }} />
                   </TouchableOpacity>
                 )}
               </TouchableOpacity>
@@ -175,7 +196,7 @@ export default function SavedScreen() {
                 <Text style={[styles.filterText, isGroupFiltered && styles.activeFilterText]}>Group</Text>
                 {isGroupFiltered && (
                   <TouchableOpacity onPress={toggleGroupFilter}>
-                    <FontAwesome name="times" size={16} color="#FF0000" style={{ marginLeft: 5 }} />
+                    <FontAwesome name="times" size={16} color="#000" style={{ marginLeft: 5 }} />
                   </TouchableOpacity>
                 )}
               </TouchableOpacity>
@@ -183,6 +204,9 @@ export default function SavedScreen() {
             {renderBoards()}
           </View>
         </ScrollView>
+
+        {/* Create Modal */}
+        <CreateModal visible={isCreateModalVisible} onClose={() => setCreateModalVisible(false)} />
 
         {/* Sort Filter Modal */}
         <Modal
@@ -198,10 +222,7 @@ export default function SavedScreen() {
                 <Text style={styles.modalOptionText}>A to Z</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.modalOption} onPress={() => setFilterVisible(false)}>
-                <Text style={styles.modalOptionText}>Custom</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.modalOption} onPress={() => setFilterVisible(false)}>
-                <Text style={styles.modalOptionText}>Last saved to</Text>
+                <Text style={styles.modalOptionText}>Z to A</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.modalCloseButton} onPress={() => setFilterVisible(false)}>
                 <Text style={styles.modalCloseButtonText}>Close</Text>
@@ -220,22 +241,13 @@ export default function SavedScreen() {
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <Text style={styles.modalHeader}>View Options</Text>
-              <TouchableOpacity style={styles.modalOption} onPress={() => {
-                setViewOption("Default");
-                setViewOptionsVisible(false);
-              }}>
+              <TouchableOpacity style={styles.modalOption} onPress={() => { setViewOption("Default"); setViewOptionsVisible(false); }}>
                 <Text style={styles.modalOptionText}>Default</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.modalOption} onPress={() => {
-                setViewOption("Wide");
-                setViewOptionsVisible(false);
-              }}>
+              <TouchableOpacity style={styles.modalOption} onPress={() => { setViewOption("Wide"); setViewOptionsVisible(false); }}>
                 <Text style={styles.modalOptionText}>Wide</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.modalOption} onPress={() => {
-                setViewOption("Compact");
-                setViewOptionsVisible(false);
-              }}>
+              <TouchableOpacity style={styles.modalOption} onPress={() => { setViewOption("Compact"); setViewOptionsVisible(false); }}>
                 <Text style={styles.modalOptionText}>Compact</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.modalCloseButton} onPress={() => setViewOptionsVisible(false)}>
@@ -244,10 +256,35 @@ export default function SavedScreen() {
             </View>
           </View>
         </Modal>
+
+        {/* Logout Confirmation Modal */}
+        <Modal
+          transparent={true}
+          visible={isLogoutModalVisible}
+          animationType="slide"
+          onRequestClose={() => setLogoutModalVisible(false)}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalHeader}>Are you sure you want to log out?</Text>
+              <View style={styles.modalButtonContainer}>
+
+                <TouchableOpacity style={styles.modalButton} onPress={() => setLogoutModalVisible(false)}>
+                  <Text style={styles.modalButtonText}>No</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.modalButton} onPress={handleLogout}>
+                  <Text style={styles.modalButtonText}>Yes</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </View>
     </SafeAreaView>
   );
 }
+
+
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -271,8 +308,8 @@ const styles = StyleSheet.create({
     left: 0,
   },
   profileImage: {
-    width: 40,
-    height: 40,
+    width: 35,
+    height: 35,
     borderRadius: 20,
   },
   buttonsWrapper: {
@@ -437,4 +474,32 @@ const styles = StyleSheet.create({
   page: {
     flex: 1,
   },
+  modalText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: "#000000",
+  },
+
+  modalButtons: {
+  },
+  modalButton: {
+    margin: 15,
+    backgroundColor: "#DCDCDC",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 15,
+    borderRadius: 250,
+    marginBottom: 10,
+    width: "38%",
+    alignSelf: "center",
+
+  },
+  modalButtonText: {
+
+  },
+  modalButtonContainer: {
+
+  }
+
 });
