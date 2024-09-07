@@ -47,17 +47,8 @@ export const PinContextProvider = ({ children }: PinContextProviderProps) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        let link =
-          "https://66d09bc0181d059277df2c5f.mockapi.io/api/pin?limit=10&page=" +
-          currentPage;
-
-        // console.log(link);
-        // console.log((currentPage - 1) * 10 + 1);
-        let rest = await api.get("/pin");
-        console.log(rest.data);
-
-        const response = await fetch(link);
-        const json = rest.data as Pin[];
+        let response = await api.get("/pin?limit=10&&page=" + currentPage);
+        const json = response.data as Pin[];
         pins ? setPins([...pins, ...json]) : setPins(json);
 
         // console.log({ json });
