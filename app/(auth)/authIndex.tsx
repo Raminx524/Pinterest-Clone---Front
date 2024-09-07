@@ -83,7 +83,6 @@ const AuthIndex = () => {
       );
 
       const country = await getCountryFromLocation();
-      console.log(country);
 
       // Sign in with the credential
       const userCredential = await auth().signInWithCredential(
