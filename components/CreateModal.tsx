@@ -7,13 +7,15 @@ import {
 } from "@expo/vector-icons";
 import { Href, useRouter } from "expo-router";
 import React from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { View, Text, StyleSheet, Pressable, Alert } from "react-native";
 import Modal from "react-native-modal";
+import * as ImagePicker from 'expo-image-picker'; // Import ImagePicker
 
 export interface IModalProps {
   visible: boolean;
   onClose: () => void;
 }
+
 const CustomCollageIcon = () => (
   <>
     <AntDesign
@@ -46,12 +48,28 @@ const CustomCollageIcon = () => (
   </>
 );
 
-export function CreateModal({ visible, onClose }: IModalProps) {
+export function CreateModal({ visible, onClose, onAddPin }: IModalProps & { onAddPin: (uri: string) => void; }) {
   const router = useRouter();
-  const navHandler = (endPoint: string) => {
-    router.push(`/(tabs)/create/${endPoint}` as Href<string>);
+
+  const navHandler = async (endPoint: string) => {
+    if (endPoint === "pin") {
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (permissionResult.granted) {
+        const result = await ImagePicker.launchImageLibraryAsync();
+        if (!result.canceled && result.assets && result.assets.length > 0) {
+          onAddPin(result.assets[0].uri); // Pass the image URI to the parent
+        }
+      } else {
+        Alert.alert("Permission to access camera roll is required!");
+      }
+    } else {
+      router.push(`/(tabs)/create/${endPoint}` as Href<string>);
+    }
+
     onClose();
   };
+
   return (
     <Modal
       isVisible={visible}
