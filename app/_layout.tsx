@@ -106,6 +106,13 @@ function RootLayoutNav() {
             fullScreenGestureEnabled: true,
           }}
         />
+        <Stack.Screen
+          name="detail-slide"
+          options={{
+            presentation: "modal",
+            animation: "slide_from_bottom",
+          }}
+        />
       </Stack>
     </GestureHandlerRootView>
   );

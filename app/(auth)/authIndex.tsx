@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
+  Platform,
 } from "react-native";
 import auth, { firebase } from "@react-native-firebase/auth";
 import { useRouter } from "expo-router";
@@ -101,7 +102,17 @@ const AuthIndex = () => {
           country,
           topics: [],
         };
-        await axios.post("http://10.0.2.2:3000/api/user", newUser);
+        let linkPlatform = "http://localhost";
+        if (Platform.OS == "ios") {
+          linkPlatform = "http://localhost";
+        } else if (Platform.OS == "android") {
+          linkPlatform = "http://10.0.2.2";
+        }
+        const resAxios = await axios.post(
+          linkPlatform + ":3000/api/user",
+          newUser
+        );
+        console.log({ resAxios });
       }
     } catch (error) {
       console.error(error);

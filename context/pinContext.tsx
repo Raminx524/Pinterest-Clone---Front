@@ -1,4 +1,5 @@
 import { Pin } from "@/app/(tabs)";
+import api from "@/utils/api.service";
 import {
   createContext,
   ReactNode,
@@ -13,9 +14,9 @@ interface PinContextProps {
   setPins: React.Dispatch<React.SetStateAction<Pin[] | null>>;
   currentPage: number;
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
-  getCurrentPin: (currentId: any) => Pin | null;
-  getPrevPin: (currentId: any) => Pin | null;
-  getNextPin: (currentId: any) => Pin | null;
+  getCurrentPin: (currentId: string) => Pin | null;
+  getPrevPin: (currentId: string) => Pin | null;
+  getNextPin: (currentId: string) => Pin | null;
   //   opacityOverlay: number;
   //   setOpacityOverlay: React.Dispatch<React.SetStateAction<number>>;
   //   changeOpacity: (opacity: number) => void;
@@ -26,9 +27,9 @@ export const PinContext = createContext<PinContextProps>({
   setPins: () => null,
   currentPage: 1,
   setCurrentPage: () => null,
-  getCurrentPin: (currentId: any) => null,
-  getPrevPin: (currentId: any) => null,
-  getNextPin: (currentId: any) => null,
+  getCurrentPin: (currentId: string) => null,
+  getPrevPin: (currentId: string) => null,
+  getNextPin: (currentId: string) => null,
   //   opacityOverlay: 1,
   //   setOpacityOverlay: () => null,
   //   changeOpacity: () => null,
@@ -52,12 +53,14 @@ export const PinContextProvider = ({ children }: PinContextProviderProps) => {
 
         // console.log(link);
         // console.log((currentPage - 1) * 10 + 1);
+        let rest = await api.get("/pin");
+        console.log(rest.data);
 
         const response = await fetch(link);
-        const json = (await response.json()) as Pin[];
+        const json = rest.data as Pin[];
         pins ? setPins([...pins, ...json]) : setPins(json);
 
-        console.log({ json });
+        // console.log({ json });
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -68,22 +71,24 @@ export const PinContextProvider = ({ children }: PinContextProviderProps) => {
   }, [currentPage]);
 
   const getCurrentPin = (currentId: string) => {
-    return pins
-      ? pins.find((pin) => pin.id === currentId)
-        ? pins.find((pin) => pin.id === currentId)
-        : null
-      : null;
+    return pins?.find((pin) => pin._id === currentId) || null;
   };
 
   const getPrevPin = (currentId: string) => {
-    const currentIndex = pins?.findIndex((pin) => pin.id === currentId);
-    const prevIndex = currentIndex - 1;
-    return pins ? pins[prevIndex] : null;
+    const currentIndex = pins?.findIndex((pin) => pin._id === currentId);
+    if (currentIndex) {
+      const prevIndex = currentIndex - 1;
+      return pins ? pins[prevIndex] : null;
+    }
+    return null;
   };
   const getNextPin = (currentId: string) => {
-    const currentIndex = pins?.findIndex((pin) => pin.id === currentId);
-    const nextIndex = currentIndex + 1;
-    return pins ? pins[nextIndex] : null;
+    const currentIndex = pins?.findIndex((pin) => pin._id === currentId);
+    if (currentIndex) {
+      const nextIndex = currentIndex + 1;
+      return pins ? pins[nextIndex] : null;
+    }
+    return null;
   };
 
   //   const changeOpacityTab = (opacity: number) => {

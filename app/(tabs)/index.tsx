@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-import React from "react";
+import React, { useRef } from "react";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 import MasonryList from "@react-native-seoul/masonry-list";
 import { router } from "expo-router";
@@ -14,16 +14,36 @@ import auth from "@react-native-firebase/auth";
 import { usePinContext } from "@/context/pinContext";
 import { PinCard } from "@/components/PinCard";
 
+export interface IUser {
+  firebaseUid: string;
+  email: string;
+  username: string;
+  dob: string;
+  gender: string;
+  country: string;
+  avatarUrl?: string;
+  bio?: string;
+  boards: string[];
+  topics: string[];
+  pins: string[];
+  followers: string[];
+  following: string[];
+  searchHistory: string[];
+}
+
 export interface Pin {
-  id: string;
-  imgURL: string;
-  text: string;
+  _id: string;
+  imageUrl: string;
+  title: string;
+  description: string;
+  user: IUser;
 }
 
 export default function TabOneScreen() {
   const isDarkMode = useColorScheme() === "dark";
   const { pins, setPins, currentPage, setCurrentPage } = usePinContext();
 
+  const callOnScrollEnd = useRef(false);
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
     flex: 1,
@@ -35,7 +55,13 @@ export default function TabOneScreen() {
 
   const renderItem = ({ item, i }: { item: Pin; i: number }): ReactElement => {
     // console.log(data);
-    return <PinCard item={item} style={{ marginLeft: i % 2 === 0 ? 0 : 15 }} />;
+    return (
+      <PinCard
+        item={item}
+        items={pins}
+        style={{ marginLeft: i % 2 === 0 ? 0 : 15 }}
+      />
+    );
   };
 
   return (
@@ -65,18 +91,20 @@ export default function TabOneScreen() {
       {/* <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} /> */}
       {pins ? (
         <MasonryList
-          keyExtractor={(item: Pin): string => item.id}
+          keyExtractor={(item: Pin): string => item._id}
           ListHeaderComponent={<View />}
           contentContainerStyle={{
             paddingHorizontal: 20,
             paddingTop: 50,
             alignSelf: "stretch",
           }}
-          onEndReached={() => (this.callOnScrollEnd = true)}
+          onEndReached={() => {
+            callOnScrollEnd.current = true;
+          }}
           onMomentumScrollEnd={() => {
             console.log("End reached");
-            this.callOnScrollEnd && loadMore();
-            this.callOnScrollEnd = false;
+            if (callOnScrollEnd.current) loadMore();
+            callOnScrollEnd.current = false;
           }}
           numColumns={2}
           data={pins}

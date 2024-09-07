@@ -21,7 +21,14 @@
           "twitter",
           "whatsapp",
           "whatsapp-messenger",
-          "fb"
+          "fb",
+          "pinterest"
+        ],
+        "NSLocationWhenInUseUsageDescription":"We need your location to provide better services",
+        "NSLocationAlwaysUsageDescription": "The Beep App will use your location to provide ETA's to yourself and others",
+        "UIBackgroundModes": [
+          "location",
+          "fetch"
         ]
       },
       "bundleIdentifier": "com.pinterestclone.ramin"
