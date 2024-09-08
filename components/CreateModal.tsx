@@ -8,9 +8,17 @@ import {
 } from "@expo/vector-icons";
 import { Href, useRouter } from "expo-router";
 import React, { useContext, useState } from "react";
-import { View, Text, StyleSheet, Pressable, Alert, ActivityIndicator, TextInput } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  Alert,
+  ActivityIndicator,
+  TextInput,
+} from "react-native";
 import Modal from "react-native-modal";
-import * as ImagePicker from 'expo-image-picker';
+import * as ImagePicker from "expo-image-picker";
 import api from "@/utils/api.service";
 import { AuthContext } from "@/context/authContext";
 
@@ -55,11 +63,11 @@ const CustomCollageIcon = () => (
 export function CreateModal({ visible, onClose }: IModalProps) {
   const [uploading, setUploading] = useState(false);
   const [showFormModal, setShowFormModal] = useState(false);
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [link, setLink] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
 
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [link, setLink] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
   const router = useRouter();
   const { user } = useContext(AuthContext);
 
@@ -69,7 +77,9 @@ export function CreateModal({ visible, onClose }: IModalProps) {
 
     const image: any = {
       uri: imageUri,
-      type: 'image/jpeg',
+
+      type: "image/jpeg",
+
       name: "upload.jpg",
     };
 
@@ -94,24 +104,49 @@ export function CreateModal({ visible, onClose }: IModalProps) {
     } catch (error) {
       setUploading(false);
       console.error("Error uploading image", error);
-      Alert.alert("Upload failed", "Failed to upload image to Cloudinary. Please try again.");
+
+      Alert.alert(
+        "Upload failed",
+        "Failed to upload image to Cloudinary. Please try again."
+      );
+
       return null;
     }
   };
 
-  const savePinImage = async (imageUrl: string, title: string, description: string, link: string) => {
+
+  const savePinImage = async (
+    imageUrl: string,
+    title: string,
+    description: string,
+    link: string
+  ) => {
+
     console.log(imageUrl);
     console.log(title);
     console.log(description);
     console.log(link);
 
     try {
-      const response = await api.post('/pin', { imageUrl, title, description, user: user?._id, linkUrl: link }); 1
+
+      const response = await api.post("/pin", {
+        imageUrl,
+        title,
+        description,
+        user: user?._id,
+        linkUrl: link,
+      });
+      1;
+
 
       console.log("Image saved successfully:", response.data);
     } catch (error) {
       console.error("Error saving image to MongoDB:", error);
-      Alert.alert("Save failed", "Failed to save image details. Please try again.");
+      Alert.alert(
+        "Save failed",
+        "Failed to save image details. Please try again."
+      );
+
     }
   };
 
@@ -137,11 +172,17 @@ export function CreateModal({ visible, onClose }: IModalProps) {
           if (cloudinaryUrl) {
             console.log("Cloudinary URL:", cloudinaryUrl);
             setImageUrl(cloudinaryUrl);
-            setShowFormModal(true);
+
+            onClose();
+            setTimeout(() => setShowFormModal(true), 500);
           }
         }
       } else {
-        Alert.alert("Permission required", "Permission to access camera roll is required!");
+        Alert.alert(
+          "Permission required",
+          "Permission to access camera roll is required!"
+        );
+
       }
     } else {
       router.push(`/(tabs)/create/${endPoint}` as Href<string>);
@@ -154,12 +195,17 @@ export function CreateModal({ visible, onClose }: IModalProps) {
     if (title && description && imageUrl) {
       await savePinImage(imageUrl, title, description, link);
       setShowFormModal(false);
-      setTitle('');
-      setDescription('');
-      setLink('');
-      setImageUrl('');
+
+      setTitle("");
+      setDescription("");
+      setLink("");
+      setImageUrl("");
     } else {
-      Alert.alert("Missing information", "Please fill in at least the title and description.");
+      Alert.alert(
+        "Missing information",
+        "Please fill in at least the title and description."
+      );
+
     }
   };
 
@@ -180,7 +226,12 @@ export function CreateModal({ visible, onClose }: IModalProps) {
             <ActivityIndicator size="large" color="#0000ff" />
           ) : (
             <View style={styles.routesContainer}>
-              <Pressable style={styles.modalLink} onPress={() => navHandler("pin")}>
+
+              <Pressable
+                style={styles.modalLink}
+                onPress={() => navHandler("pin")}
+              >
+
                 <View style={styles.iconWrapper}>
                   <FontAwesome5 name="thumbtack" size={20} color="black" />
                 </View>
@@ -200,7 +251,13 @@ export function CreateModal({ visible, onClose }: IModalProps) {
                 onPress={() => navHandler("board")}
               >
                 <View style={styles.iconWrapper}>
-                  <MaterialCommunityIcons name="collage" size={28} color="black" />
+
+                  <MaterialCommunityIcons
+                    name="collage"
+                    size={28}
+                    color="black"
+                  />
+
                 </View>
                 <Text style={styles.modalLinkText}>Board</Text>
               </Pressable>
@@ -308,22 +365,23 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     padding: 12,
     marginBottom: 15,
     borderRadius: 8,
     fontSize: 16,
   },
   submitButton: {
-    backgroundColor: '#E60023',
+    backgroundColor: "#E60023",
     padding: 15,
     borderRadius: 25,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 10,
   },
   submitButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: "white",
+    fontWeight: "bold",
     fontSize: 16,
   },
 });
+
