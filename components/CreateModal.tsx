@@ -17,6 +17,7 @@ import {
   ActivityIndicator,
   TextInput,
 } from "react-native";
+
 import Modal from "react-native-modal";
 import * as ImagePicker from "expo-image-picker";
 import api from "@/utils/api.service";
@@ -110,21 +111,18 @@ export function CreateModal({ visible, onClose }: IModalProps) {
     }
   };
 
-
   const savePinImage = async (
     imageUrl: string,
     title: string,
     description: string,
     link: string
   ) => {
-
     console.log(imageUrl);
     console.log(title);
     console.log(description);
     console.log(link);
 
     try {
-
       const response = await api.post("/pin", {
         imageUrl,
         title,
@@ -141,7 +139,6 @@ export function CreateModal({ visible, onClose }: IModalProps) {
         "Save failed",
         "Failed to save image details. Please try again."
       );
-
     }
   };
   const featureHandler = () => {
@@ -195,7 +192,6 @@ export function CreateModal({ visible, onClose }: IModalProps) {
           "Permission required",
           "Permission to access camera roll is required!"
         );
-
       }
     } else {
       router.push(`/(tabs)/create/${endPoint}` as Href<string>);
@@ -218,7 +214,6 @@ export function CreateModal({ visible, onClose }: IModalProps) {
         "Missing information",
         "Please fill in at least the title and description."
       );
-
     }
   };
 
@@ -239,12 +234,10 @@ export function CreateModal({ visible, onClose }: IModalProps) {
             <ActivityIndicator size="large" color="#0000ff" />
           ) : (
             <View style={styles.routesContainer}>
-
               <Pressable
                 style={styles.modalLink}
                 onPress={() => navHandler("pin")}
               >
-
                 <View style={styles.iconWrapper}>
                   <FontAwesome5 name="thumbtack" size={20} color="black" />
                 </View>
@@ -261,13 +254,11 @@ export function CreateModal({ visible, onClose }: IModalProps) {
                 onPress={() => navHandler("board")}
               >
                 <View style={styles.iconWrapper}>
-
                   <MaterialCommunityIcons
                     name="collage"
                     size={28}
                     color="black"
                   />
-
                 </View>
                 <Text style={styles.modalLinkText}>Board</Text>
               </Pressable>
@@ -397,4 +388,3 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
-
