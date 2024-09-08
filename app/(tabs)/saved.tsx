@@ -15,8 +15,10 @@ import auth from "@react-native-firebase/auth"; // Import Firebase auth
 import axios from "axios"; // Import axios for API calls
 import api from "@/utils/api.service";
 import { AuthContext } from "@/context/authContext";
+
 import { SafeAreaView } from "react-native-safe-area-context";
 import { CreateModal } from "@/components/CreateModal";
+
 
 const { width } = Dimensions.get("window");
 
@@ -150,6 +152,7 @@ export default function SavedScreen() {
               source={{
                 uri: "https://static.vecteezy.com/system/resources/thumbnails/007/140/806/small_2x/profile-glyph-circle-background-icon-vector.jpg",
               }}
+
               style={{ height: 40, width: 40 }}
               // style={styles.profileImage}
             />
@@ -327,30 +330,37 @@ export default function SavedScreen() {
         </ScrollView>
 
         {/* Create Modal */}
+
         <CreateModal
           visible={isCreateModalVisible}
           onClose={() => setCreateModalVisible(false)}
         />
 
+
         {/* Sort Filter Modal */}
         <Modal
           transparent={true}
+
           visible={viewOptionsVisible}
           animationType="slide"
           onRequestClose={() => setViewOptionsVisible(false)}
+
         >
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <Text style={styles.modalHeader}>Sort by</Text>
               <TouchableOpacity
                 style={styles.modalOption}
+
                 onPress={() => setViewOptionsVisible(false)}
+
               >
                 <Text style={styles.modalOptionText}>Date</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.modalOption}
                 onPress={() => setViewOptionsVisible(false)}
+
               >
                 <Text style={styles.modalOptionText}>Alphabetical</Text>
               </TouchableOpacity>
@@ -369,6 +379,7 @@ export default function SavedScreen() {
                 >
                   Close
                 </Text>
+
               </TouchableOpacity>
             </View>
           </View>
@@ -387,6 +398,7 @@ export default function SavedScreen() {
                 Are you sure you want to log out?
               </Text>
               <TouchableOpacity
+
                 // style={styles.logoutButton}
                 onPress={handleLogout}
               >
@@ -405,6 +417,7 @@ export default function SavedScreen() {
                 >
                   Cancel
                 </Text>
+
               </TouchableOpacity>
             </View>
           </View>

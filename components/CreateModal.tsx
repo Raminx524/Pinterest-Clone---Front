@@ -22,6 +22,7 @@ import * as ImagePicker from "expo-image-picker";
 import api from "@/utils/api.service";
 import { AuthContext } from "@/context/authContext";
 
+
 export interface IModalProps {
   visible: boolean;
   onClose: () => void;
@@ -62,6 +63,7 @@ const CustomCollageIcon = () => (
 export function CreateModal({ visible, onClose }: IModalProps) {
   const [uploading, setUploading] = useState(false);
   const [showFormModal, setShowFormModal] = useState(false);
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [link, setLink] = useState("");
@@ -69,12 +71,15 @@ export function CreateModal({ visible, onClose }: IModalProps) {
   const router = useRouter();
   const { user } = useContext(AuthContext);
 
+
   const uploadToCloudinary = async (imageUri: string) => {
     const data = new FormData();
 
     const image: any = {
       uri: imageUri,
+
       type: "image/jpeg",
+
       name: "upload.jpg",
     };
 
@@ -99,13 +104,16 @@ export function CreateModal({ visible, onClose }: IModalProps) {
     } catch (error) {
       setUploading(false);
       console.error("Error uploading image", error);
+
       Alert.alert(
         "Upload failed",
         "Failed to upload image to Cloudinary. Please try again."
       );
+
       return null;
     }
   };
+
 
   const savePinImage = async (
     imageUrl: string,
@@ -113,12 +121,14 @@ export function CreateModal({ visible, onClose }: IModalProps) {
     description: string,
     link: string
   ) => {
+
     console.log(imageUrl);
     console.log(title);
     console.log(description);
     console.log(link);
 
     try {
+
       const response = await api.post("/pin", {
         imageUrl,
         title,
@@ -128,6 +138,7 @@ export function CreateModal({ visible, onClose }: IModalProps) {
       });
       1;
 
+
       console.log("Image saved successfully:", response.data);
     } catch (error) {
       console.error("Error saving image to MongoDB:", error);
@@ -135,6 +146,7 @@ export function CreateModal({ visible, onClose }: IModalProps) {
         "Save failed",
         "Failed to save image details. Please try again."
       );
+
     }
   };
 
@@ -160,6 +172,7 @@ export function CreateModal({ visible, onClose }: IModalProps) {
           if (cloudinaryUrl) {
             console.log("Cloudinary URL:", cloudinaryUrl);
             setImageUrl(cloudinaryUrl);
+
             onClose();
             setTimeout(() => setShowFormModal(true), 500);
           }
@@ -169,6 +182,7 @@ export function CreateModal({ visible, onClose }: IModalProps) {
           "Permission required",
           "Permission to access camera roll is required!"
         );
+
       }
     } else {
       router.push(`/(tabs)/create/${endPoint}` as Href<string>);
@@ -181,6 +195,7 @@ export function CreateModal({ visible, onClose }: IModalProps) {
     if (title && description && imageUrl) {
       await savePinImage(imageUrl, title, description, link);
       setShowFormModal(false);
+
       setTitle("");
       setDescription("");
       setLink("");
@@ -190,6 +205,7 @@ export function CreateModal({ visible, onClose }: IModalProps) {
         "Missing information",
         "Please fill in at least the title and description."
       );
+
     }
   };
 
@@ -210,10 +226,12 @@ export function CreateModal({ visible, onClose }: IModalProps) {
             <ActivityIndicator size="large" color="#0000ff" />
           ) : (
             <View style={styles.routesContainer}>
+
               <Pressable
                 style={styles.modalLink}
                 onPress={() => navHandler("pin")}
               >
+
                 <View style={styles.iconWrapper}>
                   <FontAwesome5 name="thumbtack" size={20} color="black" />
                 </View>
@@ -233,11 +251,13 @@ export function CreateModal({ visible, onClose }: IModalProps) {
                 onPress={() => navHandler("board")}
               >
                 <View style={styles.iconWrapper}>
+
                   <MaterialCommunityIcons
                     name="collage"
                     size={28}
                     color="black"
                   />
+
                 </View>
                 <Text style={styles.modalLinkText}>Board</Text>
               </Pressable>
@@ -364,3 +384,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
+
