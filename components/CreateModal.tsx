@@ -160,7 +160,8 @@ export function CreateModal({ visible, onClose }: IModalProps) {
           if (cloudinaryUrl) {
             console.log("Cloudinary URL:", cloudinaryUrl);
             setImageUrl(cloudinaryUrl);
-            setShowFormModal(true);
+            onClose();
+            setTimeout(() => setShowFormModal(true), 500);
           }
         }
       } else {

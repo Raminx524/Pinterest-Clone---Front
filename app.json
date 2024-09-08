@@ -26,6 +26,7 @@
         ],
         "NSLocationWhenInUseUsageDescription":"We need your location to provide better services",
         "NSLocationAlwaysUsageDescription": "The Beep App will use your location to provide ETA's to yourself and others",
+        "NSPhotoLibraryUsageDescription":"This app needs accsess to your gallery",
         "UIBackgroundModes": [
           "location",
           "fetch"

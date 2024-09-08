@@ -68,27 +68,7 @@ export default function TabOneScreen() {
   return (
     <View style={backgroundStyle}>
       {/* Temp Log Out Btn */}
-      <TouchableOpacity
-        onPress={async () => {
-          try {
-            await auth().signOut();
-            router.replace("/(auth)/authIndex");
-          } catch (err) {
-            console.log(err);
-          }
-        }}
-        style={{
-          backgroundColor: "#000",
-          marginTop: 35,
-          justifyContent: "center",
-          alignItems: "center",
-          zIndex: 99,
-          width: 150,
-          height: 50,
-        }}
-      >
-        <Text style={{ color: "#fff", textAlign: "center" }}>Log Out</Text>
-      </TouchableOpacity>
+
       {/* <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} /> */}
       {pins ? (
         <MasonryList

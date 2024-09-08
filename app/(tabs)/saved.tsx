@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect, useContext } from "react";
 import {
-  SafeAreaView,
   TextInput,
   TouchableOpacity,
   Image,
@@ -16,6 +15,8 @@ import auth from "@react-native-firebase/auth"; // Import Firebase auth
 import axios from "axios"; // Import axios for API calls
 import api from "@/utils/api.service";
 import { AuthContext } from "@/context/authContext";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { CreateModal } from "@/components/CreateModal";
 
 const { width } = Dimensions.get("window");
 
@@ -142,14 +143,15 @@ export default function SavedScreen() {
       <View style={styles.container}>
         <View style={styles.buttonContainer}>
           <TouchableOpacity
-            style={styles.profileImageContainer}
+            // style={styles.profileImageContainer}
             onPress={() => setLogoutModalVisible(true)}
           >
             <Image
               source={{
                 uri: "https://static.vecteezy.com/system/resources/thumbnails/007/140/806/small_2x/profile-glyph-circle-background-icon-vector.jpg",
               }}
-              style={styles.profileImage}
+              style={{ height: 40, width: 40 }}
+              // style={styles.profileImage}
             />
           </TouchableOpacity>
           <View style={styles.buttonsWrapper}>
@@ -172,6 +174,7 @@ export default function SavedScreen() {
               <Text style={styles.buttonText}>Boards</Text>
             </TouchableOpacity>
           </View>
+          <View style={{ height: 40, width: 40 }}></View>
         </View>
         <View style={styles.searchContainer}>
           <View style={styles.searchBar}>
@@ -189,7 +192,11 @@ export default function SavedScreen() {
           </View>
           <TouchableOpacity
             style={styles.plusButton}
-            onPress={() => setCreateModalVisible(true)} // Open CreateModal on press
+            onPress={() => {
+              console.log({ isCreateModalVisible });
+
+              setCreateModalVisible(true);
+            }} // Open CreateModal on press
           >
             <FontAwesome name="plus" size={20} color="#000" />
           </TouchableOpacity>
@@ -320,41 +327,48 @@ export default function SavedScreen() {
         </ScrollView>
 
         {/* Create Modal */}
-        {/* <CreateModal visible={isCreateModalVisible} onClose={() => setCreateModalVisible(false)} /> */}
+        <CreateModal
+          visible={isCreateModalVisible}
+          onClose={() => setCreateModalVisible(false)}
+        />
 
         {/* Sort Filter Modal */}
         <Modal
           transparent={true}
-          visible={filterVisible}
+          visible={viewOptionsVisible}
           animationType="slide"
-          onRequestClose={() => setFilterVisible(false)}
+          onRequestClose={() => setViewOptionsVisible(false)}
         >
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <Text style={styles.modalHeader}>Sort by</Text>
               <TouchableOpacity
                 style={styles.modalOption}
-                onPress={() => setFilterVisible(false)}
+                onPress={() => setViewOptionsVisible(false)}
               >
                 <Text style={styles.modalOptionText}>Date</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.modalOption}
-                onPress={() => setFilterVisible(false)}
+                onPress={() => setViewOptionsVisible(false)}
               >
                 <Text style={styles.modalOptionText}>Alphabetical</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.modalOption}
-                onPress={() => setFilterVisible(false)}
+                onPress={() => setViewOptionsVisible(false)}
               >
                 <Text style={styles.modalOptionText}>Category</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={styles.closeButton}
-                onPress={() => setFilterVisible(false)}
+                // style={styles.closeButton}
+                onPress={() => setViewOptionsVisible(false)}
               >
-                <Text style={styles.closeButtonText}>Close</Text>
+                <Text
+                // style={styles.closeButtonText}
+                >
+                  Close
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -373,16 +387,24 @@ export default function SavedScreen() {
                 Are you sure you want to log out?
               </Text>
               <TouchableOpacity
-                style={styles.logoutButton}
+                // style={styles.logoutButton}
                 onPress={handleLogout}
               >
-                <Text style={styles.logoutButtonText}>Logout</Text>
+                <Text
+                // style={styles.logoutButtonText}
+                >
+                  Logout
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={styles.closeButton}
+                // style={styles.closeButton}
                 onPress={() => setLogoutModalVisible(false)}
               >
-                <Text style={styles.closeButtonText}>Cancel</Text>
+                <Text
+                // style={styles.closeButtonText}
+                >
+                  Cancel
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -399,7 +421,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    padding: 20,
+    paddingHorizontal: 20,
   },
   buttonContainer: {
     flexDirection: "row",
@@ -539,7 +561,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-end",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    // backgroundColor: "rgba(0, 0, 0, 0.5)",
+    shadowColor: "#000",
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
   },
   modalContent: {
     width: "100%",
