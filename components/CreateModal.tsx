@@ -67,7 +67,6 @@ export function CreateModal({ visible, onClose }: IModalProps) {
   const [description, setDescription] = useState("");
   const [link, setLink] = useState("");
   const [imageUrl, setImageUrl] = useState("");
-
   const router = useRouter();
   const { user } = useContext(AuthContext);
 
@@ -101,13 +100,16 @@ export function CreateModal({ visible, onClose }: IModalProps) {
     } catch (error) {
       setUploading(false);
       console.error("Error uploading image", error);
+
       Alert.alert(
         "Upload failed",
         "Failed to upload image to Cloudinary. Please try again."
       );
+
       return null;
     }
   };
+
 
   const savePinImage = async (
     imageUrl: string,
@@ -115,12 +117,14 @@ export function CreateModal({ visible, onClose }: IModalProps) {
     description: string,
     link: string
   ) => {
+
     console.log(imageUrl);
     console.log(title);
     console.log(description);
     console.log(link);
 
     try {
+
       const response = await api.post("/pin", {
         imageUrl,
         title,
@@ -137,6 +141,7 @@ export function CreateModal({ visible, onClose }: IModalProps) {
         "Save failed",
         "Failed to save image details. Please try again."
       );
+
     }
   };
   const featureHandler = () => {
@@ -180,7 +185,9 @@ export function CreateModal({ visible, onClose }: IModalProps) {
           if (cloudinaryUrl) {
             console.log("Cloudinary URL:", cloudinaryUrl);
             setImageUrl(cloudinaryUrl);
-            setShowFormModal(true);
+
+            onClose();
+            setTimeout(() => setShowFormModal(true), 500);
           }
         }
       } else {
@@ -188,6 +195,7 @@ export function CreateModal({ visible, onClose }: IModalProps) {
           "Permission required",
           "Permission to access camera roll is required!"
         );
+
       }
     } else {
       router.push(`/(tabs)/create/${endPoint}` as Href<string>);
@@ -200,6 +208,7 @@ export function CreateModal({ visible, onClose }: IModalProps) {
     if (title && description && imageUrl) {
       await savePinImage(imageUrl, title, description, link);
       setShowFormModal(false);
+
       setTitle("");
       setDescription("");
       setLink("");
@@ -209,6 +218,7 @@ export function CreateModal({ visible, onClose }: IModalProps) {
         "Missing information",
         "Please fill in at least the title and description."
       );
+
     }
   };
 
@@ -229,10 +239,12 @@ export function CreateModal({ visible, onClose }: IModalProps) {
             <ActivityIndicator size="large" color="#0000ff" />
           ) : (
             <View style={styles.routesContainer}>
+
               <Pressable
                 style={styles.modalLink}
                 onPress={() => navHandler("pin")}
               >
+
                 <View style={styles.iconWrapper}>
                   <FontAwesome5 name="thumbtack" size={20} color="black" />
                 </View>
@@ -249,11 +261,13 @@ export function CreateModal({ visible, onClose }: IModalProps) {
                 onPress={() => navHandler("board")}
               >
                 <View style={styles.iconWrapper}>
+
                   <MaterialCommunityIcons
                     name="collage"
                     size={28}
                     color="black"
                   />
+
                 </View>
                 <Text style={styles.modalLinkText}>Board</Text>
               </Pressable>
@@ -383,3 +397,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
+
