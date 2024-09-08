@@ -17,15 +17,7 @@ import {
   ActivityIndicator,
   TextInput,
 } from "react-native";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  Alert,
-  ActivityIndicator,
-  TextInput,
-} from "react-native";
+
 import Modal from "react-native-modal";
 import * as ImagePicker from "expo-image-picker";
 import api from "@/utils/api.service";
