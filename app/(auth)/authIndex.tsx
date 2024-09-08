@@ -19,6 +19,7 @@ import { AntDesign, FontAwesome6 } from "@expo/vector-icons";
 import RegisterError, { IValidationError } from "@/components/RegisterError";
 import axios from "axios";
 import { getCountryFromLocation } from "@/utils/getCountry";
+import Toast from "react-native-root-toast";
 
 const AuthIndex = () => {
   const [email, setEmail] = useState("");
@@ -71,7 +72,21 @@ const AuthIndex = () => {
     }
   };
 
-  const facebookHandler = async () => {};
+  const facebookHandler = async () => {
+    let toast = Toast.show(
+      "This feature is currently under maintenance. Check back soon!",
+      {
+        duration: Toast.durations.LONG,
+        position: Toast.positions.TOP,
+        backgroundColor: "red",
+        opacity: 1,
+        shadow: true,
+        animation: true,
+        hideOnPress: true,
+        delay: 0,
+      }
+    );
+  };
 
   const googleHandler = async () => {
     try {

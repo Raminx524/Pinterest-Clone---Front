@@ -17,11 +17,20 @@ import {
   ActivityIndicator,
   TextInput,
 } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  Alert,
+  ActivityIndicator,
+  TextInput,
+} from "react-native";
 import Modal from "react-native-modal";
 import * as ImagePicker from "expo-image-picker";
 import api from "@/utils/api.service";
 import { AuthContext } from "@/context/authContext";
-
+import Toast from "react-native-root-toast";
 
 export interface IModalProps {
   visible: boolean;
@@ -71,7 +80,6 @@ export function CreateModal({ visible, onClose }: IModalProps) {
   const router = useRouter();
   const { user } = useContext(AuthContext);
 
-
   const uploadToCloudinary = async (imageUri: string) => {
     const data = new FormData();
 
@@ -114,21 +122,18 @@ export function CreateModal({ visible, onClose }: IModalProps) {
     }
   };
 
-
   const savePinImage = async (
     imageUrl: string,
     title: string,
     description: string,
     link: string
   ) => {
-
     console.log(imageUrl);
     console.log(title);
     console.log(description);
     console.log(link);
 
     try {
-
       const response = await api.post("/pin", {
         imageUrl,
         title,
@@ -138,7 +143,6 @@ export function CreateModal({ visible, onClose }: IModalProps) {
       });
       1;
 
-
       console.log("Image saved successfully:", response.data);
     } catch (error) {
       console.error("Error saving image to MongoDB:", error);
@@ -146,10 +150,27 @@ export function CreateModal({ visible, onClose }: IModalProps) {
         "Save failed",
         "Failed to save image details. Please try again."
       );
-
     }
   };
-
+  const featureHandler = () => {
+    let toast = Toast.show(
+      "This feature is currently under maintenance. Check back soon!",
+      {
+        duration: Toast.durations.LONG,
+        position: Toast.positions.TOP,
+        backgroundColor: "red",
+        opacity: 1,
+        shadow: true,
+        animation: true,
+        hideOnPress: true,
+        delay: 0,
+        containerStyle: {
+          zIndex: 9999,
+          elevation: 10,
+        },
+      }
+    );
+  };
   const navHandler = async (endPoint: string) => {
     if (endPoint === "pin") {
       const permissionResult =
@@ -182,7 +203,6 @@ export function CreateModal({ visible, onClose }: IModalProps) {
           "Permission required",
           "Permission to access camera roll is required!"
         );
-
       }
     } else {
       router.push(`/(tabs)/create/${endPoint}` as Href<string>);
@@ -205,7 +225,6 @@ export function CreateModal({ visible, onClose }: IModalProps) {
         "Missing information",
         "Please fill in at least the title and description."
       );
-
     }
   };
 
@@ -226,21 +245,16 @@ export function CreateModal({ visible, onClose }: IModalProps) {
             <ActivityIndicator size="large" color="#0000ff" />
           ) : (
             <View style={styles.routesContainer}>
-
               <Pressable
                 style={styles.modalLink}
                 onPress={() => navHandler("pin")}
               >
-
                 <View style={styles.iconWrapper}>
                   <FontAwesome5 name="thumbtack" size={20} color="black" />
                 </View>
                 <Text style={styles.modalLinkText}>Pin</Text>
               </Pressable>
-              <Pressable
-                style={styles.modalLink}
-                onPress={() => navHandler("collage")}
-              >
+              <Pressable style={styles.modalLink} onPress={featureHandler}>
                 <View style={styles.iconWrapper}>
                   <CustomCollageIcon />
                 </View>
@@ -251,13 +265,11 @@ export function CreateModal({ visible, onClose }: IModalProps) {
                 onPress={() => navHandler("board")}
               >
                 <View style={styles.iconWrapper}>
-
                   <MaterialCommunityIcons
                     name="collage"
                     size={28}
                     color="black"
                   />
-
                 </View>
                 <Text style={styles.modalLinkText}>Board</Text>
               </Pressable>
@@ -312,7 +324,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-end",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.2)",
+    backgroundColor: "transparent",
+    shadowColor: "#000",
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
   },
   modalContent: {
     width: "100%",
@@ -384,4 +399,3 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
-
