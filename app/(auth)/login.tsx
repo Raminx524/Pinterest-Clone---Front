@@ -19,6 +19,7 @@ import {
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import RegisterError, { IValidationError } from "@/components/RegisterError";
 import { useRegisterData } from "@/context/registerContext";
+import Toast from "react-native-root-toast";
 
 export default function Login() {
   const router = useRouter();
@@ -26,7 +27,21 @@ export default function Login() {
   const { registerData, setRegisterData } = useRegisterData();
   const [securePass, setSecurePass] = useState(true);
 
-  const facebookHandler = async () => {};
+  const facebookHandler = async () => {
+    let toast = Toast.show(
+      "This feature is currently under maintenance. Check back soon!",
+      {
+        duration: Toast.durations.LONG,
+        position: Toast.positions.BOTTOM,
+        backgroundColor: "red",
+        opacity: 1,
+        shadow: true,
+        animation: true,
+        hideOnPress: true,
+        delay: 0,
+      }
+    );
+  };
 
   const googleHandler = async () => {
     try {

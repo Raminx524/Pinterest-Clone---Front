@@ -4,19 +4,47 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
-  Image,
-  Linking,
   Dimensions,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FontAwesome6 } from "@expo/vector-icons";
 import api from "@/utils/api.service";
-import { PinCard } from "@/components/PinCard";
+import { CreateBoardPinCard } from "@/components/CreateBoardPinCard";
+import { Pin } from "@/app/(tabs)/index";
+import { useLocalSearchParams, useRouter } from "expo-router";
 
 const searchPins = () => {
-  const [pins, setPins] = useState([]);
+  const [pins, setPins] = useState<Pin[]>([]);
+  const [activePins, setActivePins] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const { isVisible, collaborators, title, user } = useLocalSearchParams();
+  console.log({ isVisible, collaborators, title, user });
+
+  const togglePinHandler = (pinId: string) => {
+    const isExist = activePins.includes(pinId);
+    if (isExist) setActivePins((prev) => prev.filter((pin) => pin !== pinId));
+    else setActivePins((prev) => [...prev, pinId]);
+  };
+
+  const handleNext = async () => {
+    const newBoard = {
+      isVisible,
+      user,
+      title,
+      collaborators: collaborators === "" ? [] : collaborators.split(","),
+      pins: activePins,
+    };
+    try {
+      const res = await api.post("/board", newBoard);
+      console.log(res.data);
+      router.replace("/(tabs)/saved");
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   useEffect(() => {
     const getPins = async () => {
       setLoading(true);
@@ -41,10 +69,12 @@ const searchPins = () => {
     <SafeAreaView style={searchPinsStyles.modalContainer}>
       <View style={searchPinsStyles.header}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
-          <FontAwesome6 name="x" size={18} />
+          <TouchableOpacity onPress={() => router.back()}>
+            <FontAwesome6 name="x" size={18} />
+          </TouchableOpacity>
           <Text style={{ fontSize: 16, fontWeight: "500" }}>Add Pins</Text>
         </View>
-        <TouchableOpacity style={searchPinsStyles.button}>
+        <TouchableOpacity style={searchPinsStyles.button} onPress={handleNext}>
           <Text style={{ color: "white" }}>Done</Text>
         </TouchableOpacity>
       </View>
@@ -57,9 +87,11 @@ const searchPins = () => {
         data={pins}
         renderItem={({ item, i }: any) => {
           return (
-            <PinCard
+            <CreateBoardPinCard
               item={item}
               items={pins}
+              isActive={activePins.includes(item._id)}
+              onPress={togglePinHandler}
               style={{
                 marginLeft: i % 2 === 0 ? 0 : 15,
                 width: Dimensions.get("screen").width / 2 - 25,
@@ -82,6 +114,7 @@ const searchPinsStyles = StyleSheet.create({
   header: {
     flexDirection: "row",
     paddingHorizontal: 12,
+    paddingVertical: 12,
     width: "100%",
     justifyContent: "space-between",
     alignItems: "center",

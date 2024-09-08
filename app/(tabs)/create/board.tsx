@@ -15,6 +15,7 @@ import { useSharedValue } from "react-native-reanimated";
 import { Switch } from "@/components/Switch";
 import { AuthContext } from "@/context/authContext";
 import api from "@/utils/api.service";
+import Toast from "react-native-root-toast";
 
 export default function Board() {
   const { user } = useContext(AuthContext);
@@ -27,17 +28,15 @@ export default function Board() {
   };
 
   const handleNext = async () => {
-    const newBoard = {
-      isVisible: !isOn,
-      user: user?._id,
-      collaborators,
-      title,
-    };
     try {
-      // const res = await api.post("/board", newBoard);
       router.replace({
         pathname: "/(tabs)/create/searchPins",
-        // params: { board: res.data },
+        params: {
+          isVisible: `${!isOn}`,
+          collaborators: collaborators.join(","),
+          title,
+          user: user?._id,
+        },
       });
     } catch (err) {
       console.log("Error creating board: ", err);
@@ -79,7 +78,24 @@ export default function Board() {
             style={{ ...styles.input, borderWidth: 2, borderColor: "#c8c8c8" }}
           />
         </View>
-        <View style={{ gap: 8 }}>
+        <TouchableOpacity
+          style={{ gap: 8 }}
+          onPress={() => {
+            let toast = Toast.show(
+              "This feature is currently under maintenance. Check back soon!",
+              {
+                duration: Toast.durations.LONG,
+                position: Toast.positions.BOTTOM,
+                backgroundColor: "red",
+                opacity: 1,
+                shadow: true,
+                animation: true,
+                hideOnPress: true,
+                delay: 0,
+              }
+            );
+          }}
+        >
           <Text style={{ fontSize: 16 }}>Collaborators</Text>
           <View
             style={{
@@ -100,7 +116,7 @@ export default function Board() {
               Add collaborators
             </Text>
           </View>
-        </View>
+        </TouchableOpacity>
         <View style={{ gap: 12 }}>
           <Text style={{ fontSize: 16 }}>Visibility</Text>
           <View
