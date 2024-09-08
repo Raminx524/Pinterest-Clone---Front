@@ -61,7 +61,9 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
       }
       if (loading) setLoading(false);
     };
-
+    initUser();
+  }, []);
+  useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(async (user) => {
       let newUser;
       try {
@@ -74,9 +76,9 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
       setUser(newUser);
       setLoading(false);
     });
-    initUser();
+
     return unsubscribe;
-  }, []);
+  }, [auth().currentUser]);
 
   return (
     <AuthContext.Provider value={{ user, loading, setUser }}>

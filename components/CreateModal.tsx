@@ -21,7 +21,7 @@ import Modal from "react-native-modal";
 import * as ImagePicker from "expo-image-picker";
 import api from "@/utils/api.service";
 import { AuthContext } from "@/context/authContext";
-
+import Toast from "react-native-root-toast";
 
 export interface IModalProps {
   visible: boolean;
@@ -63,7 +63,6 @@ const CustomCollageIcon = () => (
 export function CreateModal({ visible, onClose }: IModalProps) {
   const [uploading, setUploading] = useState(false);
   const [showFormModal, setShowFormModal] = useState(false);
-
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [link, setLink] = useState("");
@@ -71,15 +70,12 @@ export function CreateModal({ visible, onClose }: IModalProps) {
   const router = useRouter();
   const { user } = useContext(AuthContext);
 
-
   const uploadToCloudinary = async (imageUri: string) => {
     const data = new FormData();
 
     const image: any = {
       uri: imageUri,
-
       type: "image/jpeg",
-
       name: "upload.jpg",
     };
 
@@ -138,7 +134,6 @@ export function CreateModal({ visible, onClose }: IModalProps) {
       });
       1;
 
-
       console.log("Image saved successfully:", response.data);
     } catch (error) {
       console.error("Error saving image to MongoDB:", error);
@@ -149,7 +144,25 @@ export function CreateModal({ visible, onClose }: IModalProps) {
 
     }
   };
-
+  const featureHandler = () => {
+    let toast = Toast.show(
+      "This feature is currently under maintenance. Check back soon!",
+      {
+        duration: Toast.durations.LONG,
+        position: Toast.positions.TOP,
+        backgroundColor: "red",
+        opacity: 1,
+        shadow: true,
+        animation: true,
+        hideOnPress: true,
+        delay: 0,
+        containerStyle: {
+          zIndex: 9999,
+          elevation: 10,
+        },
+      }
+    );
+  };
   const navHandler = async (endPoint: string) => {
     if (endPoint === "pin") {
       const permissionResult =
@@ -237,10 +250,7 @@ export function CreateModal({ visible, onClose }: IModalProps) {
                 </View>
                 <Text style={styles.modalLinkText}>Pin</Text>
               </Pressable>
-              <Pressable
-                style={styles.modalLink}
-                onPress={() => navHandler("collage")}
-              >
+              <Pressable style={styles.modalLink} onPress={featureHandler}>
                 <View style={styles.iconWrapper}>
                   <CustomCollageIcon />
                 </View>
@@ -312,7 +322,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-end",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.2)",
+    backgroundColor: "transparent",
+    shadowColor: "#000",
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
   },
   modalContent: {
     width: "100%",

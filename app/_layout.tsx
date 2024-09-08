@@ -18,6 +18,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { firebase } from "@react-native-firebase/auth";
 import { firebaseConfig } from "@/config/firebaseConfig";
 import { PinContextProvider, usePinContext } from "@/context/pinContext";
+import { RootSiblingParent } from "react-native-root-siblings";
 
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
@@ -57,7 +58,9 @@ export default function RootLayout() {
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <PinContextProvider>
         <AuthContextProvider>
-          <RootLayoutNav />
+          <RootSiblingParent>
+            <RootLayoutNav />
+          </RootSiblingParent>
         </AuthContextProvider>
       </PinContextProvider>
     </ThemeProvider>
